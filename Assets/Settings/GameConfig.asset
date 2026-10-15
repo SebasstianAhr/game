@@ -1,0 +1,45 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 628da4aa3d3b3914cbda71bc15019a04, type: 3}
+  m_Name: GameConfig
+  m_EditorClassIdentifier: Assembly-CSharp::OnePercent.GameConfig
+  startingCoins: 100
+  goalCoins: 10000
+  roundCost: 1
+  saveReturn: 2
+  moderateStake: 20
+  moderatePayoutMultiplier: 2
+  moderateDisplayedProbability: 0.5
+  allInStake: 100
+  allInPayoutMultiplier: 100
+  allInDisplayedProbability: 0.01
+  sunModerateProbability: 0.65
+  moonModerateProbability: 0.3
+  eyeModerateProbability: 0.5
+  sunAllInProbability: 0.01
+  moonAllInProbability: 0.01
+  eyeAllInProbability: 0.05
+  sunWeight: 0.4
+  moonWeight: 0.4
+  eyeWeight: 0.2
+  streakLength: 3
+  streakModerateBonus: 0.15
+  minigameThresholdCoins: 10
+  minigameDuration: 10
+  projectileFallTime: 2
+  projectileSpawnInterval: 0.8
+  coinsPerBlock: 3
+  maxMinigameReward: 30
+  blockZoneTop: 0.3
+  patternMinSamples: 8
+  useFixedSeed: 0
+  fixedSeed: 12345
