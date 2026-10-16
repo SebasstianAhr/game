@@ -65,6 +65,7 @@ namespace OnePercent
         private static readonly Color Gold = new Color(0.949f, 0.812f, 0.478f);     // #F2CF7A
         private static readonly Color Urgent = new Color(0.910f, 0.475f, 0.541f);   // #E8798A
         private RectTransform fxLayer;
+        private int lastTickSecond = -1;
         private Color timerBaseColor = Color.white;
 
         public void Initialize()
@@ -111,6 +112,7 @@ namespace OnePercent
             onFinished = finishedCallback;
             state = State.Intro;
             elapsed = 0f;
+            lastTickSecond = -1;
             spawnTimer = 0f;
             blocks = 0;
             reward = 0;
@@ -143,6 +145,7 @@ namespace OnePercent
             }
 
             state = State.Playing;
+            AudioManager.Play(Sfx.ShieldStart);
             overlay.SetActive(false);
             SetLaneButtonsInteractable(true);
         }
@@ -173,6 +176,12 @@ namespace OnePercent
             timerText.text = "Tiempo: " + remaining.ToString("0.0", CultureInfo.InvariantCulture);
             // Los últimos 3 segundos el tiempo se pone en rojo para meter prisa.
             timerText.color = remaining <= 3f ? Urgent : timerBaseColor;
+            int wholeSecond = Mathf.CeilToInt(remaining);
+            if (remaining > 0f && remaining <= 3f && wholeSecond != lastTickSecond)
+            {
+                lastTickSecond = wholeSecond;
+                AudioManager.Play(Sfx.TimerTick);
+            }
 
             if (elapsed >= config.minigameDuration)
             {
@@ -284,6 +293,7 @@ namespace OnePercent
             UiFx.SparkBurst(this, fxLayer, hitPosition, sparkSprite, Gold, 10, 150f, 34f);
             UiFx.FloatingText(this, fxLayer, hitPosition, gained > 0 ? "+" + gained : "MÁX", scoreText.font, 48, Gold);
             StartCoroutine(UiFx.Punch(scoreText.transform, 0.15f, 0.25f));
+            AudioManager.Play(Sfx.ShieldBlock);
         }
 
         private void Finish()

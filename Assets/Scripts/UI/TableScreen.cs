@@ -197,6 +197,7 @@ namespace OnePercent
         private IEnumerator DecisionRoutine(BetAction action)
         {
             RectTransform card = symbolImage.rectTransform;
+            AudioManager.Play(Sfx.CardLift, 0.7f);
             const float duration = 0.12f;
             float t = 0f;
             while (t < duration)
@@ -243,6 +244,8 @@ namespace OnePercent
             if (round.IsBet && round.Won)
             {
                 StartCoroutine(UiFx.Punch(coinsText.transform, 0.18f, 0.35f));
+                bool allIn = lastConfig != null && round.Stake >= lastConfig.allInStake;
+                AudioManager.Play(allIn ? Sfx.BigWin : Sfx.Win);
                 Transform coinSource = coinIcon != null ? coinIcon.transform : coinsText.transform;
                 UiFx.SparkBurst(this, fxLayer, coinSource.position, sparkSprite, Gold, 8, 120f, 26f);
                 UiFx.SparkBurst(this, fxLayer, symbolImage.rectTransform.position, sparkSprite, Gold, 14, 240f, 40f);
@@ -250,10 +253,12 @@ namespace OnePercent
             else if (round.IsBet)
             {
                 StartCoroutine(UiFx.Shake(coinsText.rectTransform, coinsBasePosition, 18f, 0.3f));
+                AudioManager.Play(Sfx.Lose);
             }
             else
             {
                 StartCoroutine(UiFx.Punch(coinsText.transform, 0.06f, 0.25f));
+                AudioManager.Play(Sfx.Save);
             }
 
             // 4. La carta gira y muestra el símbolo de la siguiente ronda.
@@ -279,6 +284,7 @@ namespace OnePercent
             }
 
             RefreshCard(symbol);
+            AudioManager.Play(Sfx.CardFlip, 0.6f);
 
             const float openTime = 0.12f;
             t = 0f;

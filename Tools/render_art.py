@@ -75,6 +75,8 @@ ASSETS = {
     "Background/astrolabe.png": astrolabe(),
     "Background/motif_eye.png": motif(OJO_S), "Background/motif_moon.png": motif(LUNA_S),
     "Shield/projectile.png": diamond(),
+    "Icons/sound_on.png": '<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 100 100"><g fill="none" stroke="#FFFFFF" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"><path d="M16 40H32L52 24V76L32 60H16Z"/><path d="M64 38Q72 50 64 62M72 28Q88 50 72 72"/></g></svg>',
+    "Icons/sound_off.png": '<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 100 100"><g fill="none" stroke="#FFFFFF" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"><path d="M16 40H32L52 24V76L32 60H16Z"/><path d="M66 40L86 60M86 40L66 60"/></g></svg>',
     "FX/spark.png": '<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 100 100"><g fill="#FFFFFF">' + STAR4 + '</g></svg>',
 }
 

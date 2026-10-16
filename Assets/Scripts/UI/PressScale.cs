@@ -29,6 +29,7 @@ namespace OnePercent
             }
 
             pressed = true;
+            AudioManager.Play(Sfx.Tap, 0.5f);
         }
 
         public void OnPointerUp(PointerEventData eventData)

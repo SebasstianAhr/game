@@ -18,6 +18,7 @@ namespace OnePercent.EditorTools
     /// redondeados, fondo con astrolabio y motivos sutiles. Las imágenes viven en Assets/Art y este script
     /// las configura solo como sprites antes de construir. Si alguna falta, se usa un color liso.
     /// Etapa 3 (vida): fundido al cambiar de pantalla, botones que se hunden, destellos y 60 fps.
+    /// Etapa 4 (audio): AudioManager con música y efectos de Assets/Audio, botón de silencio y ajustes de sonido.
     /// IMPORTANTE: este script es la única fuente de verdad de la interfaz. Los cambios hechos a mano
     /// en la escena se pierden al volver a ejecutar "Construir escena".
     /// </summary>
@@ -26,6 +27,7 @@ namespace OnePercent.EditorTools
         private const string ScenePath = "Assets/Scenes/Main.unity";
         private const string ConfigPath = "Assets/Settings/GameConfig.asset";
         private const string ArtFolder = "Assets/Art";
+        private const string AudioFolder = "Assets/Audio";
 
         // Fuentes opcionales (Google Fonts, licencia OFL). Si no existen se usa la fuente por defecto de Unity.
         private const string BodyFontPath = "Assets/Fonts/Figtree-Regular.ttf";
@@ -61,6 +63,12 @@ namespace OnePercent.EditorTools
         private static Sprite motifMoonSprite;
         private static Sprite projectileSprite;
         private static Sprite sparkSprite;
+        private static Sprite soundOnSprite;
+        private static Sprite soundOffSprite;
+
+        private static AudioClip[] sfxClips;
+        private static AudioClip tableMusic;
+        private static AudioClip shieldMusic;
         private static Sprite sunCard;
         private static Sprite moonCard;
         private static Sprite eyeCard;
@@ -79,6 +87,8 @@ namespace OnePercent.EditorTools
             LoadFonts();
             PrepareArt();
             LoadSprites();
+            PrepareAudio();
+            LoadAudio();
             ConfigurePortrait();
             GameConfig config = LoadOrCreateConfig();
             EnsureFolder("Assets", "Scenes");
@@ -97,6 +107,13 @@ namespace OnePercent.EditorTools
             ShieldMinigameScreen shield = BuildShieldPanel(safeArea);
             StatsScreen stats = BuildStatsPanel(safeArea);
             EndScreen end = BuildEndPanel(safeArea);
+
+            // Audio: música y efectos (Etapa 4).
+            GameObject audioObject = new GameObject("AudioManager");
+            AudioManager audioManager = audioObject.AddComponent<AudioManager>();
+            AssignArray(audioManager, "sfxClips", sfxClips);
+            AssignOptional(audioManager, "tableMusic", tableMusic);
+            AssignOptional(audioManager, "shieldMusic", shieldMusic);
 
             GameObject managerObject = new GameObject("GameManager");
             GameManager manager = managerObject.AddComponent<GameManager>();
@@ -229,6 +246,8 @@ namespace OnePercent.EditorTools
             motifMoonSprite = LoadSprite("Background/motif_moon.png");
             projectileSprite = LoadSprite("Shield/projectile.png");
             sparkSprite = LoadSprite("FX/spark.png");
+            soundOnSprite = LoadSprite("Icons/sound_on.png");
+            soundOffSprite = LoadSprite("Icons/sound_off.png");
             sunCard = LoadSprite("Cards/card_sol.png");
             moonCard = LoadSprite("Cards/card_luna.png");
             eyeCard = LoadSprite("Cards/card_ojo.png");
@@ -240,6 +259,59 @@ namespace OnePercent.EditorTools
         private static Sprite LoadSprite(string relativePath)
         {
             return AssetDatabase.LoadAssetAtPath<Sprite>(ArtFolder + "/" + relativePath);
+        }
+
+        /// <summary>
+        /// Configura los sonidos de Assets/Audio para móvil: la música se lee poco a poco del disco (Streaming, Vorbis)
+        /// y los efectos cortos se cargan en memoria (ADPCM) para sonar sin retraso. Todo en mono.
+        /// </summary>
+        private static void PrepareAudio()
+        {
+            if (!AssetDatabase.IsValidFolder(AudioFolder))
+            {
+                Debug.LogWarning("[1% de Probabilidad] No existe " + AudioFolder + ". El juego no tendrá sonido.");
+                return;
+            }
+
+            string[] guids = AssetDatabase.FindAssets("t:AudioClip", new[] { AudioFolder });
+            for (int i = 0; i < guids.Length; i++)
+            {
+                string path = AssetDatabase.GUIDToAssetPath(guids[i]);
+                AudioImporter importer = AssetImporter.GetAtPath(path) as AudioImporter;
+                if (importer == null)
+                {
+                    continue;
+                }
+
+                bool music = path.Contains("/Music/");
+                AudioClipLoadType loadType = music ? AudioClipLoadType.Streaming : AudioClipLoadType.DecompressOnLoad;
+                AudioCompressionFormat format = music ? AudioCompressionFormat.Vorbis : AudioCompressionFormat.ADPCM;
+                AudioImporterSampleSettings settings = importer.defaultSampleSettings;
+                if (settings.loadType == loadType && settings.compressionFormat == format && importer.forceToMono)
+                {
+                    continue;
+                }
+
+                settings.loadType = loadType;
+                settings.compressionFormat = format;
+                settings.quality = 0.6f;
+                importer.defaultSampleSettings = settings;
+                importer.forceToMono = true;
+                importer.loadInBackground = music;
+                importer.SaveAndReimport();
+            }
+        }
+
+        private static void LoadAudio()
+        {
+            sfxClips = new AudioClip[AudioManager.SfxFileNames.Length];
+            for (int i = 0; i < sfxClips.Length; i++)
+            {
+                sfxClips[i] = AssetDatabase.LoadAssetAtPath<AudioClip>(AudioFolder + "/Sfx/" + AudioManager.SfxFileNames[i] + ".wav");
+            }
+
+            tableMusic = AssetDatabase.LoadAssetAtPath<AudioClip>(AudioFolder + "/Music/music_table.ogg");
+            shieldMusic = AssetDatabase.LoadAssetAtPath<AudioClip>(AudioFolder + "/Music/music_shield.ogg");
         }
 
         /// <summary>El juego es solo vertical: sin giro automático a horizontal.</summary>
@@ -361,7 +433,7 @@ namespace OnePercent.EditorTools
             // Barra superior: moneda, cantidad y estadísticas.
             Image coinIcon = NewDecor("CoinIcon", root, V(0.05f, 0.912f), V(0.13f, 0.968f), coinSprite, 1f);
             float coinsLeft = coinSprite != null ? 0.145f : 0.05f;
-            Text coins = NewText("CoinsText", root, V(coinsLeft, 0.905f), V(0.66f, 0.975f),
+            Text coins = NewText("CoinsText", root, V(coinsLeft, 0.905f), V(0.54f, 0.975f),
                 "100", 80, TextAnchor.MiddleLeft, Gold, boldFont);
             coins.resizeTextForBestFit = true;
             coins.resizeTextMinSize = 40;
@@ -370,6 +442,7 @@ namespace OnePercent.EditorTools
             Text unusedLabel;
             Button statsButton = NewButton("StatsButton", root, V(0.68f, 0.915f), V(0.95f, 0.965f),
                 "Estadísticas", 34, ButtonBlue, out unusedLabel);
+            NewSoundButton(root, V(0.56f, 0.915f), V(0.66f, 0.965f));
 
             Text goal = NewText("GoalText", root, V(0.05f, 0.868f), V(0.95f, 0.900f),
                 "Meta  10.000", 34, TextAnchor.MiddleLeft, Mist, bodyFont);
@@ -585,7 +658,11 @@ namespace OnePercent.EditorTools
             // En vertical, las tres columnas pasan a ser tres bloques apilados.
             Text stats = NewSection("StatsBlock", root, V(0.05f, 0.705f), V(0.95f, 0.920f));
             Text patterns = NewSection("PatternsBlock", root, V(0.05f, 0.430f), V(0.95f, 0.695f));
-            Text achievements = NewSection("AchievementsBlock", root, V(0.05f, 0.125f), V(0.95f, 0.420f));
+            Text achievements = NewSection("AchievementsBlock", root, V(0.05f, 0.200f), V(0.95f, 0.420f));
+
+            // Ajustes de sonido (Etapa 4).
+            NewAudioToggle("MusicToggle", root, V(0.05f, 0.122f), V(0.48f, 0.185f), AudioSettingToggle.Setting.Music);
+            NewAudioToggle("EffectsToggle", root, V(0.52f, 0.122f), V(0.95f, 0.185f), AudioSettingToggle.Setting.Effects);
 
             Text backLabel;
             Button back = NewButton("BackButton", root, V(0.05f, 0.03f), V(0.48f, 0.105f),
@@ -729,6 +806,40 @@ namespace OnePercent.EditorTools
             fitter.aspectMode = AspectRatioFitter.AspectMode.FitInParent;
             fitter.aspectRatio = aspect;
             return image;
+        }
+
+        /// <summary>Botón cuadrado con icono de altavoz que silencia o activa todo el sonido.</summary>
+        private static void NewSoundButton(Transform parent, Vector2 anchorMin, Vector2 anchorMax)
+        {
+            Text label;
+            Button button = NewButton("SoundButton", parent, anchorMin, anchorMax, string.Empty, 20, ButtonBlue, out label);
+            Image icon = NewImage("Icon", button.transform, V(0.2f, 0.2f), V(0.8f, 0.8f), Gold);
+            icon.sprite = soundOnSprite;
+            icon.preserveAspect = true;
+            icon.raycastTarget = false;
+            if (soundOnSprite == null)
+            {
+                icon.enabled = false;
+                label.text = "♪";
+            }
+
+            SoundToggleButton toggle = button.gameObject.AddComponent<SoundToggleButton>();
+            Assign(toggle, "icon", icon);
+            AssignOptional(toggle, "soundOnSprite", soundOnSprite);
+            AssignOptional(toggle, "soundOffSprite", soundOffSprite);
+        }
+
+        /// <summary>Botón "Música: SÍ / NO" o "Efectos: SÍ / NO".</summary>
+        private static void NewAudioToggle(string name, Transform parent, Vector2 anchorMin, Vector2 anchorMax,
+            AudioSettingToggle.Setting setting)
+        {
+            Text label;
+            Button button = NewButton(name, parent, anchorMin, anchorMax, "Música: SÍ", 32, Hex(0x1B2456), out label);
+            AudioSettingToggle toggle = button.gameObject.AddComponent<AudioSettingToggle>();
+            SerializedObject serialized = new SerializedObject(toggle);
+            serialized.FindProperty("setting").enumValueIndex = (int)setting;
+            serialized.FindProperty("label").objectReferenceValue = label;
+            serialized.ApplyModifiedPropertiesWithoutUndo();
         }
 
         private static Text NewText(string name, Transform parent, Vector2 anchorMin, Vector2 anchorMax,

@@ -101,6 +101,7 @@ namespace OnePercent
 
             tableScreen.Show();
             tableScreen.Refresh(session, config, lastMessage);
+            AudioManager.PlayMusic(Music.Table);
         }
 
         private void OnActionChosen(BetAction action)
@@ -112,6 +113,7 @@ namespace OnePercent
 
             RoundResult result = session.Play(action);
             List<AchievementInfo> unlocked = tracker.RegisterRound(result);
+            PlayAchievementSound(unlocked);
             SaveService.Save(tracker.Data);
 
             lastMessage = BuildRoundMessage(result, unlocked);
@@ -143,12 +145,15 @@ namespace OnePercent
             tableScreen.Hide();
             shieldScreen.Show();
             shieldScreen.Begin(config, session.Coins, OnMinigameFinished);
+            AudioManager.PlayMusic(Music.Shield);
+            AudioManager.Play(Sfx.ShieldAlert);
         }
 
         private void OnMinigameFinished(int reward)
         {
             session.ApplyMinigameReward(reward);
             List<AchievementInfo> unlocked = tracker.RegisterMinigame(reward, session.Coins);
+            PlayAchievementSound(unlocked);
             SaveService.Save(tracker.Data);
 
             StringBuilder builder = new StringBuilder();
@@ -168,6 +173,15 @@ namespace OnePercent
             {
                 tableScreen.Show();
                 tableScreen.Refresh(session, config, lastMessage);
+                AudioManager.PlayMusic(Music.Table);
+            }
+        }
+
+        private static void PlayAchievementSound(List<AchievementInfo> unlocked)
+        {
+            if (unlocked != null && unlocked.Count > 0)
+            {
+                AudioManager.Play(Sfx.Achievement, 0.8f);
             }
         }
 
@@ -181,6 +195,8 @@ namespace OnePercent
             SaveService.Save(tracker.Data);
 
             endScreen.Show(session.Outcome, session, config);
+            AudioManager.PlayMusic(Music.None);
+            AudioManager.Play(victory ? Sfx.Victory : Sfx.Bankrupt);
         }
 
         private void OnStatsRequested()
