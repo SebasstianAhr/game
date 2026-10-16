@@ -17,6 +17,7 @@ namespace OnePercent.EditorTools
     /// Etapa 2 (identidad visual): cartas del símbolo, moneda, registro con mini cartas, paneles y botones
     /// redondeados, fondo con astrolabio y motivos sutiles. Las imágenes viven en Assets/Art y este script
     /// las configura solo como sprites antes de construir. Si alguna falta, se usa un color liso.
+    /// Etapa 3 (vida): fundido al cambiar de pantalla, botones que se hunden, destellos y 60 fps.
     /// IMPORTANTE: este script es la única fuente de verdad de la interfaz. Los cambios hechos a mano
     /// en la escena se pierden al volver a ejecutar "Construir escena".
     /// </summary>
@@ -59,6 +60,7 @@ namespace OnePercent.EditorTools
         private static Sprite motifEyeSprite;
         private static Sprite motifMoonSprite;
         private static Sprite projectileSprite;
+        private static Sprite sparkSprite;
         private static Sprite sunCard;
         private static Sprite moonCard;
         private static Sprite eyeCard;
@@ -98,6 +100,7 @@ namespace OnePercent.EditorTools
 
             GameObject managerObject = new GameObject("GameManager");
             GameManager manager = managerObject.AddComponent<GameManager>();
+            managerObject.AddComponent<AppSettings>();
             Assign(manager, "config", config);
             Assign(manager, "tableScreen", table);
             Assign(manager, "shieldScreen", shield);
@@ -225,6 +228,7 @@ namespace OnePercent.EditorTools
             motifEyeSprite = LoadSprite("Background/motif_eye.png");
             motifMoonSprite = LoadSprite("Background/motif_moon.png");
             projectileSprite = LoadSprite("Shield/projectile.png");
+            sparkSprite = LoadSprite("FX/spark.png");
             sunCard = LoadSprite("Cards/card_sol.png");
             moonCard = LoadSprite("Cards/card_luna.png");
             eyeCard = LoadSprite("Cards/card_ojo.png");
@@ -346,6 +350,7 @@ namespace OnePercent.EditorTools
             Image panel = NewImage("TablePanel", parent, V(0f, 0f), V(1f, 1f), Night);
             Transform root = panel.transform;
             TableScreen screen = panel.gameObject.AddComponent<TableScreen>();
+            panel.gameObject.AddComponent<ScreenFade>();
 
             // Fondo: astrolabio detrás de la carta y dos motivos apenas visibles. No cambian entre rondas.
             RectTransform ringsArea = NewRect("BackgroundRingsArea", root, V(-0.20f, 0.47f), V(1.20f, 0.95f));
@@ -354,7 +359,7 @@ namespace OnePercent.EditorTools
             NewDecor("MotifMoon", root, V(0.85f, 0.790f), V(0.97f, 0.850f), motifMoonSprite, 0.16f);
 
             // Barra superior: moneda, cantidad y estadísticas.
-            NewDecor("CoinIcon", root, V(0.05f, 0.912f), V(0.13f, 0.968f), coinSprite, 1f);
+            Image coinIcon = NewDecor("CoinIcon", root, V(0.05f, 0.912f), V(0.13f, 0.968f), coinSprite, 1f);
             float coinsLeft = coinSprite != null ? 0.145f : 0.05f;
             Text coins = NewText("CoinsText", root, V(coinsLeft, 0.905f), V(0.66f, 0.975f),
                 "100", 80, TextAnchor.MiddleLeft, Gold, boldFont);
@@ -371,7 +376,7 @@ namespace OnePercent.EditorTools
 
             // La carta del símbolo: resplandor detrás y la carta con su proporción (0,7), con el nombre dentro.
             RectTransform glowArea = NewRect("CardGlowArea", root, V(0.05f, 0.520f), V(0.95f, 0.895f));
-            NewFitted("CardGlow", glowArea, glowSprite, 0.75f, Color.white);
+            Image cardGlow = NewFitted("CardGlow", glowArea, glowSprite, 0.75f, Color.white);
 
             RectTransform symbolArea = NewRect("SymbolArea", root, V(0.20f, 0.565f), V(0.80f, 0.850f));
             Image symbolImage = NewImage("SymbolImage", symbolArea, V(0f, 0f), V(1f, 1f),
@@ -489,6 +494,9 @@ namespace OnePercent.EditorTools
             AssignOptional(screen, "sunIcon", sunIcon);
             AssignOptional(screen, "moonIcon", moonIcon);
             AssignOptional(screen, "eyeIcon", eyeIcon);
+            AssignOptional(screen, "cardGlow", cardGlow);
+            AssignOptional(screen, "coinIcon", coinIcon);
+            AssignOptional(screen, "sparkSprite", sparkSprite);
             Assign(screen, "saveButton", saveButton);
             Assign(screen, "moderateButton", moderateButton);
             Assign(screen, "allInButton", allInButton);
@@ -508,6 +516,7 @@ namespace OnePercent.EditorTools
             Image panel = NewImage("ShieldPanel", parent, V(0f, 0f), V(1f, 1f), Night);
             Transform root = panel.transform;
             ShieldMinigameScreen screen = panel.gameObject.AddComponent<ShieldMinigameScreen>();
+            panel.gameObject.AddComponent<ScreenFade>();
 
             NewText("TitleText", root, V(0.05f, 0.930f), V(0.95f, 0.985f),
                 "EL ESCUDO", 64, TextAnchor.MiddleCenter, Gold, titleFont);
@@ -556,6 +565,7 @@ namespace OnePercent.EditorTools
             AssignArray(screen, "laneAreas", lanes);
             AssignArray(screen, "laneButtons", laneButtons);
             AssignOptional(screen, "projectileSprite", projectileSprite);
+            AssignOptional(screen, "sparkSprite", sparkSprite);
 
             return screen;
         }
@@ -567,6 +577,7 @@ namespace OnePercent.EditorTools
             Image panel = NewImage("StatsPanel", parent, V(0f, 0f), V(1f, 1f), Night);
             Transform root = panel.transform;
             StatsScreen screen = panel.gameObject.AddComponent<StatsScreen>();
+            panel.gameObject.AddComponent<ScreenFade>();
 
             NewText("TitleText", root, V(0.05f, 0.930f), V(0.95f, 0.985f),
                 "LOGROS Y ESTADÍSTICAS", 54, TextAnchor.MiddleCenter, Gold, titleFont);
@@ -612,6 +623,7 @@ namespace OnePercent.EditorTools
             Image panel = NewImage("EndPanel", parent, V(0f, 0f), V(1f, 1f), Night);
             Transform root = panel.transform;
             EndScreen screen = panel.gameObject.AddComponent<EndScreen>();
+            panel.gameObject.AddComponent<ScreenFade>();
 
             RectTransform ringsArea = NewRect("BackgroundRingsArea", root, V(-0.20f, 0.45f), V(1.20f, 0.97f));
             NewFitted("BackgroundRings", ringsArea, astrolabeSprite, 1f, Color.white);
@@ -752,6 +764,7 @@ namespace OnePercent.EditorTools
 
             Button button = image.gameObject.AddComponent<Button>();
             button.targetGraphic = image;
+            image.gameObject.AddComponent<PressScale>();
 
             ColorBlock colors = button.colors;
             colors.normalColor = Color.white;

@@ -75,6 +75,7 @@ ASSETS = {
     "Background/astrolabe.png": astrolabe(),
     "Background/motif_eye.png": motif(OJO_S), "Background/motif_moon.png": motif(LUNA_S),
     "Shield/projectile.png": diamond(),
+    "FX/spark.png": '<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 100 100"><g fill="#FFFFFF">' + STAR4 + '</g></svg>',
 }
 
 with sync_playwright() as p:

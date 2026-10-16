@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
@@ -22,6 +23,10 @@ namespace OnePercent
         private GameSession session;
         private StatsTracker tracker;
         private string lastMessage = string.Empty;
+
+        // Pausa antes de pasar al Escudo o a la pantalla final, para que se vea el resultado de la ronda.
+        private const float TransitionDelay = 0.8f;
+        private bool transitioning;
 
         private void Start()
         {
@@ -100,7 +105,7 @@ namespace OnePercent
 
         private void OnActionChosen(BetAction action)
         {
-            if (session == null || !session.CanPerform(action))
+            if (transitioning || session == null || !session.CanPerform(action))
             {
                 return;
             }
@@ -111,18 +116,26 @@ namespace OnePercent
 
             lastMessage = BuildRoundMessage(result, unlocked);
 
+            // Siempre se muestra primero el resultado en la mesa (con su animación).
+            tableScreen.Refresh(session, config, lastMessage);
+
             if (session.Outcome != GameOutcome.InProgress)
             {
-                FinishGame();
+                StartCoroutine(AfterDelay(FinishGame));
             }
             else if (session.ShouldOfferMinigame)
             {
-                StartMinigame();
+                StartCoroutine(AfterDelay(StartMinigame));
             }
-            else
-            {
-                tableScreen.Refresh(session, config, lastMessage);
-            }
+        }
+
+        /// <summary>Espera un momento (sin aceptar más acciones) y luego ejecuta el siguiente paso.</summary>
+        private IEnumerator AfterDelay(System.Action next)
+        {
+            transitioning = true;
+            yield return new WaitForSecondsRealtime(TransitionDelay);
+            transitioning = false;
+            next();
         }
 
         private void StartMinigame()
@@ -172,6 +185,11 @@ namespace OnePercent
 
         private void OnStatsRequested()
         {
+            if (transitioning)
+            {
+                return;
+            }
+
             tableScreen.Hide();
             endScreen.Hide();
             statsScreen.Show(tracker.Data, config);

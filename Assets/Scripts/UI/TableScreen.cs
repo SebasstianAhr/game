@@ -1,11 +1,17 @@
 using System;
+using System.Collections;
 using System.Globalization;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace OnePercent
 {
-    /// <summary>Pantalla 1: Reto Central - Mesa de decisiones.</summary>
+    /// <summary>
+    /// Pantalla 1: Reto Central - Mesa de decisiones.
+    /// Etapa 3: animaciones. Al elegir, la carta se eleva un instante; al llegar el resultado, las monedas
+    /// cuentan hasta el nuevo valor, la nueva mini carta aparece, hay destellos al ganar o un temblor al perder,
+    /// y la carta gira para mostrar el símbolo de la siguiente ronda. Mientras dura, no se aceptan más toques.
+    /// </summary>
     public class TableScreen : MonoBehaviour
     {
         [Header("Textos")]
@@ -33,6 +39,11 @@ namespace OnePercent
         [SerializeField] private Sprite moonIcon;
         [SerializeField] private Sprite eyeIcon;
 
+        [Header("Efectos (opcionales)")]
+        [SerializeField] private Image cardGlow;
+        [SerializeField] private Image coinIcon;
+        [SerializeField] private Sprite sparkSprite;
+
         [Header("Botones")]
         [SerializeField] private Button saveButton;
         [SerializeField] private Button moderateButton;
@@ -59,12 +70,22 @@ namespace OnePercent
         private static readonly Color DisabledText = new Color(0.435f, 0.455f, 0.600f); // #6F7499
 
         // Espacio que no permite partir la línea: "APOSTAR 100" nunca se divide en dos renglones.
-        private const string Nbsp = "\u00A0";
+        private const string Nbsp = " ";
 
         private bool initialized;
         private bool debugVisible;
         private GameSession lastSession;
         private GameConfig lastConfig;
+
+        // Estado de las animaciones.
+        private RectTransform fxLayer;
+        private bool busy;
+        private bool hasShown;
+        private int lastHistoryCount;
+        private int displayedCoins;
+        private int targetCoins;
+        private int refreshCount;
+        private Vector2 coinsBasePosition;
 
         public void Initialize()
         {
@@ -74,12 +95,12 @@ namespace OnePercent
             }
 
             initialized = true;
-            saveButton.onClick.AddListener(() => Raise(BetAction.Save));
-            moderateButton.onClick.AddListener(() => Raise(BetAction.Moderate));
-            allInButton.onClick.AddListener(() => Raise(BetAction.AllIn));
+            saveButton.onClick.AddListener(() => OnDecision(BetAction.Save));
+            moderateButton.onClick.AddListener(() => OnDecision(BetAction.Moderate));
+            allInButton.onClick.AddListener(() => OnDecision(BetAction.AllIn));
             statsButton.onClick.AddListener(() =>
             {
-                if (StatsRequested != null)
+                if (!busy && StatsRequested != null)
                 {
                     StatsRequested();
                 }
@@ -88,6 +109,9 @@ namespace OnePercent
 
             // El botón Debug revela la probabilidad real: solo existe en el editor y en compilaciones de desarrollo.
             debugButton.gameObject.SetActive(Debug.isDebugBuild);
+
+            fxLayer = UiFx.CreateFxLayer(transform);
+            coinsBasePosition = coinsText.rectTransform.anchoredPosition;
         }
 
         public void Show()
@@ -104,12 +128,9 @@ namespace OnePercent
         {
             lastSession = session;
             lastConfig = config;
+            refreshCount++;
 
-            coinsText.text = FormatNumber(session.Coins);
             goalText.text = "Meta  " + FormatNumber(config.goalCoins) + "      Ronda  " + (session.Round + 1);
-            messageText.text = message;
-
-            RefreshCard(session.CurrentSymbol);
 
             saveLabel.text = "GUARDAR\n+" + config.saveReturn + Nbsp + "monedas\n" +
                              Labels.Percent(config.GetDisplayedProbability(BetAction.Save));
@@ -122,9 +143,221 @@ namespace OnePercent
             SetButtonState(moderateButton, moderateLabel, session.CanPerform(BetAction.Moderate));
             SetButtonState(allInButton, allInLabel, session.CanPerform(BetAction.AllIn));
 
-            RefreshHistory(session);
             RefreshDebug();
+
+            int count = session.History.Count;
+            targetCoins = session.Coins;
+            bool canAnimate = hasShown && isActiveAndEnabled;
+            bool newRound = canAnimate && count == lastHistoryCount + 1;
+
+            ResetAnimations();
+            if (newRound)
+            {
+                busy = true;
+                StartCoroutine(ResultRoutine(session.History[count - 1], message, session.CurrentSymbol, session));
+            }
+            else
+            {
+                // Sin ronda nueva (inicio, volver de estadísticas, volver del Escudo): se muestra todo directo.
+                messageText.text = message;
+                RefreshCard(session.CurrentSymbol);
+                RefreshHistory(session);
+                if (canAnimate && targetCoins != displayedCoins)
+                {
+                    // Por ejemplo, la recompensa del Escudo: las monedas suben contando.
+                    StartCoroutine(CountCoins(displayedCoins, targetCoins, 0.6f));
+                    StartCoroutine(UiFx.Punch(coinsText.transform, 0.12f, 0.35f));
+                }
+                else
+                {
+                    SetCoins(targetCoins);
+                }
+
+                busy = false;
+            }
+
+            lastHistoryCount = count;
+            hasShown = true;
         }
+
+        // ------------------------------------------------------------------ Decisión y resultado
+
+        private void OnDecision(BetAction action)
+        {
+            if (busy || !isActiveAndEnabled)
+            {
+                return;
+            }
+
+            busy = true;
+            StartCoroutine(DecisionRoutine(action));
+        }
+
+        /// <summary>Anticipación: la carta se eleva y su resplandor crece un instante antes de revelar el resultado.</summary>
+        private IEnumerator DecisionRoutine(BetAction action)
+        {
+            RectTransform card = symbolImage.rectTransform;
+            const float duration = 0.12f;
+            float t = 0f;
+            while (t < duration)
+            {
+                t += Time.unscaledDeltaTime;
+                float k = UiFx.EaseInOutSine(Mathf.Clamp01(t / duration));
+                float s = 1f + 0.06f * k;
+                card.localScale = new Vector3(s, s, 1f);
+                if (cardGlow != null)
+                {
+                    float g = 1f + 0.10f * k;
+                    cardGlow.rectTransform.localScale = new Vector3(g, g, 1f);
+                }
+
+                yield return null;
+            }
+
+            int before = refreshCount;
+            Raise(action);
+
+            // Si el juego no aceptó la acción (no llegó ningún resultado), se deja todo como estaba.
+            if (refreshCount == before && isActiveAndEnabled)
+            {
+                ResetAnimations();
+                busy = false;
+            }
+        }
+
+        private IEnumerator ResultRoutine(RoundResult round, string message, BackgroundSymbol nextSymbol, GameSession session)
+        {
+            // 1. Registro: la nueva mini carta aparece con un pequeño rebote.
+            RefreshHistory(session);
+            if (historySlots.Length > 0 && historySlots[0].gameObject.activeSelf)
+            {
+                StartCoroutine(UiFx.Scale(historySlots[0].transform, Vector3.one * 0.6f, Vector3.one, 0.22f, UiFx.EaseOutBack));
+            }
+
+            // 2. Mensaje con fundido.
+            messageText.text = message;
+            StartCoroutine(UiFx.Fade(messageText, 0f, 1f, 0.18f));
+
+            // 3. Monedas: cuentan hasta el nuevo valor, con una reacción según el resultado.
+            StartCoroutine(CountCoins(displayedCoins, targetCoins, 0.35f));
+            if (round.IsBet && round.Won)
+            {
+                StartCoroutine(UiFx.Punch(coinsText.transform, 0.18f, 0.35f));
+                Transform coinSource = coinIcon != null ? coinIcon.transform : coinsText.transform;
+                UiFx.SparkBurst(this, fxLayer, coinSource.position, sparkSprite, Gold, 8, 120f, 26f);
+                UiFx.SparkBurst(this, fxLayer, symbolImage.rectTransform.position, sparkSprite, Gold, 14, 240f, 40f);
+            }
+            else if (round.IsBet)
+            {
+                StartCoroutine(UiFx.Shake(coinsText.rectTransform, coinsBasePosition, 18f, 0.3f));
+            }
+            else
+            {
+                StartCoroutine(UiFx.Punch(coinsText.transform, 0.06f, 0.25f));
+            }
+
+            // 4. La carta gira y muestra el símbolo de la siguiente ronda.
+            yield return FlipCard(nextSymbol);
+
+            busy = false;
+        }
+
+        /// <summary>Giro de la carta: se estrecha hasta desaparecer, cambia de dibujo y vuelve a abrirse.</summary>
+        private IEnumerator FlipCard(BackgroundSymbol symbol)
+        {
+            RectTransform card = symbolImage.rectTransform;
+            Vector3 start = card.localScale;
+
+            const float closeTime = 0.08f;
+            float t = 0f;
+            while (t < closeTime)
+            {
+                t += Time.unscaledDeltaTime;
+                float k = UiFx.EaseInOutSine(Mathf.Clamp01(t / closeTime));
+                card.localScale = new Vector3(Mathf.Lerp(start.x, 0f, k), Mathf.Lerp(start.y, 1f, k), 1f);
+                yield return null;
+            }
+
+            RefreshCard(symbol);
+
+            const float openTime = 0.12f;
+            t = 0f;
+            while (t < openTime)
+            {
+                t += Time.unscaledDeltaTime;
+                float k = UiFx.EaseOutCubic(Mathf.Clamp01(t / openTime));
+                card.localScale = new Vector3(k, 1f, 1f);
+                yield return null;
+            }
+
+            card.localScale = Vector3.one;
+        }
+
+        private IEnumerator CountCoins(int from, int to, float duration)
+        {
+            float t = 0f;
+            while (t < duration)
+            {
+                t += Time.unscaledDeltaTime;
+                float k = UiFx.EaseOutCubic(Mathf.Clamp01(t / duration));
+                SetCoins(Mathf.RoundToInt(Mathf.Lerp(from, to, k)));
+                yield return null;
+            }
+
+            SetCoins(to);
+        }
+
+        private void SetCoins(int value)
+        {
+            displayedCoins = value;
+            coinsText.text = FormatNumber(value);
+        }
+
+        /// <summary>Detiene cualquier animación en curso y deja todo en su estado de reposo.</summary>
+        private void ResetAnimations()
+        {
+            StopAllCoroutines();
+            if (!initialized)
+            {
+                return;
+            }
+
+            symbolImage.rectTransform.localScale = Vector3.one;
+            if (cardGlow != null)
+            {
+                cardGlow.rectTransform.localScale = Vector3.one;
+            }
+
+            coinsText.transform.localScale = Vector3.one;
+            coinsText.rectTransform.anchoredPosition = coinsBasePosition;
+            UiFx.SetAlpha(messageText, 1f);
+            for (int i = 0; i < historySlots.Length; i++)
+            {
+                historySlots[i].transform.localScale = Vector3.one;
+            }
+
+            UiFx.ClearFxLayer(fxLayer);
+        }
+
+        private void OnDisable()
+        {
+            if (!initialized)
+            {
+                return;
+            }
+
+            // Al cambiar de pantalla a mitad de una animación, se salta al resultado final.
+            ResetAnimations();
+            SetCoins(targetCoins);
+            if (lastSession != null)
+            {
+                RefreshCard(lastSession.CurrentSymbol);
+            }
+
+            busy = false;
+        }
+
+        // ------------------------------------------------------------------ Contenido
 
         private void RefreshCard(BackgroundSymbol symbol)
         {

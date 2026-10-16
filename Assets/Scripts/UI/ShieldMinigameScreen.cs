@@ -30,6 +30,8 @@ namespace OnePercent
         [Header("Aspecto")]
         [Tooltip("Imagen del proyectil (rombo). Si falta, se dibuja un rectángulo de color.")]
         [SerializeField] private Sprite projectileSprite;
+        [Tooltip("Destello que sale al bloquear un proyectil.")]
+        [SerializeField] private Sprite sparkSprite;
 
         private enum State
         {
@@ -59,6 +61,12 @@ namespace OnePercent
         private int blocks;
         private int reward;
 
+        // Efectos visuales (Etapa 3).
+        private static readonly Color Gold = new Color(0.949f, 0.812f, 0.478f);     // #F2CF7A
+        private static readonly Color Urgent = new Color(0.910f, 0.475f, 0.541f);   // #E8798A
+        private RectTransform fxLayer;
+        private Color timerBaseColor = Color.white;
+
         public void Initialize()
         {
             if (initialized)
@@ -72,6 +80,8 @@ namespace OnePercent
             continueButton.onClick.AddListener(Continue);
 
             zones = new RectTransform[laneAreas.Length];
+            fxLayer = UiFx.CreateFxLayer(transform);
+            timerBaseColor = timerText.color;
             for (int i = 0; i < laneButtons.Length; i++)
             {
                 int lane = i;
@@ -86,6 +96,9 @@ namespace OnePercent
 
         public void Hide()
         {
+            UiFx.ClearFxLayer(fxLayer);
+            scoreText.transform.localScale = Vector3.one;
+            timerText.color = timerBaseColor;
             ClearProjectiles();
             state = State.Idle;
             gameObject.SetActive(false);
@@ -118,6 +131,7 @@ namespace OnePercent
                 "Tienes " + config.minigameDuration.ToString("0", CultureInfo.InvariantCulture) + " segundos.";
 
             timerText.text = "Tiempo: " + config.minigameDuration.ToString("0.0", CultureInfo.InvariantCulture);
+            timerText.color = timerBaseColor;
             UpdateScore();
         }
 
@@ -157,6 +171,8 @@ namespace OnePercent
 
             float remaining = Mathf.Max(0f, config.minigameDuration - elapsed);
             timerText.text = "Tiempo: " + remaining.ToString("0.0", CultureInfo.InvariantCulture);
+            // Los últimos 3 segundos el tiempo se pone en rojo para meter prisa.
+            timerText.color = remaining <= 3f ? Urgent : timerBaseColor;
 
             if (elapsed >= config.minigameDuration)
             {
@@ -256,10 +272,18 @@ namespace OnePercent
                 return;
             }
 
+            Vector3 hitPosition = best.Rect.position;
+            int before = Mathf.Min(blocks * config.coinsPerBlock, config.maxMinigameReward);
             Destroy(best.Rect.gameObject);
             projectiles.Remove(best);
             blocks++;
             UpdateScore();
+
+            // Respuesta visual al bloquear: destellos dorados, "+3" que sube y el marcador que late.
+            int gained = Mathf.Min(blocks * config.coinsPerBlock, config.maxMinigameReward) - before;
+            UiFx.SparkBurst(this, fxLayer, hitPosition, sparkSprite, Gold, 10, 150f, 34f);
+            UiFx.FloatingText(this, fxLayer, hitPosition, gained > 0 ? "+" + gained : "MÁX", scoreText.font, 48, Gold);
+            StartCoroutine(UiFx.Punch(scoreText.transform, 0.15f, 0.25f));
         }
 
         private void Finish()
