@@ -27,6 +27,10 @@ namespace OnePercent
         [SerializeField] private RectTransform[] laneAreas;
         [SerializeField] private Button[] laneButtons;
 
+        [Header("Aspecto")]
+        [Tooltip("Imagen del proyectil (rombo). Si falta, se dibuja un rectángulo de color.")]
+        [SerializeField] private Sprite projectileSprite;
+
         private enum State
         {
             Idle,
@@ -169,7 +173,16 @@ namespace OnePercent
             go.transform.SetParent(laneAreas[lane], false);
 
             Image image = go.GetComponent<Image>();
-            image.color = new Color(0.761f, 0.220f, 0.310f); // carmín #C2384F
+            if (projectileSprite != null)
+            {
+                image.sprite = projectileSprite;
+                image.preserveAspect = true;
+                image.color = Color.white;
+            }
+            else
+            {
+                image.color = new Color(0.761f, 0.220f, 0.310f); // carmín #C2384F
+            }
             image.raycastTarget = false;
 
             RectTransform rect = go.GetComponent<RectTransform>();
@@ -331,6 +344,9 @@ namespace OnePercent
 
                 zones[i].anchorMin = new Vector2(0f, 0f);
                 zones[i].anchorMax = new Vector2(1f, config.blockZoneTop);
+                // Un poco hacia dentro para no tapar el borde dorado redondeado del carril.
+                zones[i].offsetMin = new Vector2(4f, 4f);
+                zones[i].offsetMax = new Vector2(-4f, 0f);
             }
         }
 

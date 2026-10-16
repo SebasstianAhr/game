@@ -1,5 +1,5 @@
 using System;
-using System.Text;
+using System.Globalization;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -12,12 +12,26 @@ namespace OnePercent
         [SerializeField] private Text coinsText;
         [SerializeField] private Text goalText;
         [SerializeField] private Text messageText;
+        [Tooltip("Texto que se muestra en el registro cuando aún no hay rondas.")]
         [SerializeField] private Text historyText;
+        [Tooltip("Nombre de la carta, escrito dentro de la carta (EL SOL, LA LUNA, EL OJO).")]
         [SerializeField] private Text symbolCaptionText;
         [SerializeField] private Text debugText;
 
-        [Header("Símbolo del fondo")]
+        [Header("Carta del símbolo")]
         [SerializeField] private Image symbolImage;
+        [SerializeField] private Sprite sunCard;
+        [SerializeField] private Sprite moonCard;
+        [SerializeField] private Sprite eyeCard;
+
+        [Header("Registro (mini cartas, la más reciente a la izquierda)")]
+        [SerializeField] private Image[] historySlots;
+        [SerializeField] private Image[] historyOutlines;
+        [SerializeField] private Image[] historyIcons;
+        [SerializeField] private Text[] historyNumbers;
+        [SerializeField] private Sprite sunIcon;
+        [SerializeField] private Sprite moonIcon;
+        [SerializeField] private Sprite eyeIcon;
 
         [Header("Botones")]
         [SerializeField] private Button saveButton;
@@ -34,8 +48,18 @@ namespace OnePercent
         public event Action<BetAction> ActionChosen;
         public event Action StatsRequested;
 
-        // En vertical caben menos líneas sin que el texto quede diminuto.
-        private const int HistoryLines = 6;
+        // Colores de la paleta "tarot nocturno".
+        private static readonly Color Ivory = new Color(0.929f, 0.902f, 0.827f);   // #EDE6D3
+        private static readonly Color Gold = new Color(0.949f, 0.812f, 0.478f);    // #F2CF7A
+        private static readonly Color GoldLine = new Color(0.788f, 0.647f, 0.353f); // #C9A55A
+        private static readonly Color Indigo = new Color(0.106f, 0.141f, 0.337f);  // #1B2456
+        private static readonly Color Faded = new Color(0.553f, 0.573f, 0.710f);   // #8D92B5
+        private static readonly Color FadedLine = new Color(0.208f, 0.235f, 0.416f); // #353C6A
+        private static readonly Color DarkSlot = new Color(0.043f, 0.059f, 0.141f); // #0B0F24
+        private static readonly Color DisabledText = new Color(0.435f, 0.455f, 0.600f); // #6F7499
+
+        // Espacio que no permite partir la línea: "APOSTAR 100" nunca se divide en dos renglones.
+        private const string Nbsp = "\u00A0";
 
         private bool initialized;
         private bool debugVisible;
@@ -81,26 +105,50 @@ namespace OnePercent
             lastSession = session;
             lastConfig = config;
 
-            coinsText.text = "Monedas: " + session.Coins;
-            goalText.text = "Meta: " + config.goalCoins + "   |   Ronda: " + (session.Round + 1);
+            coinsText.text = FormatNumber(session.Coins);
+            goalText.text = "Meta  " + FormatNumber(config.goalCoins) + "      Ronda  " + (session.Round + 1);
             messageText.text = message;
 
-            symbolImage.color = Labels.SymbolColor(session.CurrentSymbol);
-            symbolCaptionText.text = "Símbolo del fondo: " + Labels.SymbolName(session.CurrentSymbol);
+            RefreshCard(session.CurrentSymbol);
 
-            saveLabel.text = "GUARDAR\n+" + config.saveReturn + " monedas\n(" +
-                             Labels.Percent(config.GetDisplayedProbability(BetAction.Save)) + ")";
-            moderateLabel.text = "APOSTAR " + config.moderateStake + "\nGana x" + config.moderatePayoutMultiplier +
-                                 "\n(" + Labels.Percent(config.GetDisplayedProbability(BetAction.Moderate)) + ")";
-            allInLabel.text = "APOSTAR " + config.allInStake + "\nGana x" + config.allInPayoutMultiplier +
-                              "\n(" + Labels.Percent(config.GetDisplayedProbability(BetAction.AllIn)) + ")";
+            saveLabel.text = "GUARDAR\n+" + config.saveReturn + Nbsp + "monedas\n" +
+                             Labels.Percent(config.GetDisplayedProbability(BetAction.Save));
+            moderateLabel.text = "APOSTAR" + Nbsp + config.moderateStake + "\nGana" + Nbsp + "×" + config.moderatePayoutMultiplier +
+                                 "\n" + Labels.Percent(config.GetDisplayedProbability(BetAction.Moderate));
+            allInLabel.text = "APOSTAR" + Nbsp + config.allInStake + "\nGana" + Nbsp + "×" + config.allInPayoutMultiplier +
+                              "\n" + Labels.Percent(config.GetDisplayedProbability(BetAction.AllIn));
 
-            saveButton.interactable = session.CanPerform(BetAction.Save);
-            moderateButton.interactable = session.CanPerform(BetAction.Moderate);
-            allInButton.interactable = session.CanPerform(BetAction.AllIn);
+            SetButtonState(saveButton, saveLabel, session.CanPerform(BetAction.Save));
+            SetButtonState(moderateButton, moderateLabel, session.CanPerform(BetAction.Moderate));
+            SetButtonState(allInButton, allInLabel, session.CanPerform(BetAction.AllIn));
 
-            historyText.text = BuildHistory(session);
+            RefreshHistory(session);
             RefreshDebug();
+        }
+
+        private void RefreshCard(BackgroundSymbol symbol)
+        {
+            Sprite card = CardSprite(symbol);
+            if (card != null)
+            {
+                symbolImage.sprite = card;
+                symbolImage.color = Color.white;
+            }
+            else
+            {
+                // Sin la imagen de la carta, se vuelve al color del símbolo.
+                symbolImage.sprite = null;
+                symbolImage.color = Labels.SymbolColor(symbol);
+            }
+
+            symbolCaptionText.text = CardName(symbol);
+        }
+
+        /// <summary>Un botón desactivado oscurece también su texto, para que no parezca disponible.</summary>
+        private static void SetButtonState(Button button, Text label, bool available)
+        {
+            button.interactable = available;
+            label.color = available ? Ivory : DisabledText;
         }
 
         private void Raise(BetAction action)
@@ -134,40 +182,95 @@ namespace OnePercent
                 "Racha: " + lastSession.ConsecutiveWins + " victorias / " + lastSession.ConsecutiveLosses + " derrotas";
         }
 
-        private static string BuildHistory(GameSession session)
+        /// <summary>
+        /// Llena las mini cartas del registro: la más reciente a la izquierda.
+        /// Ganó = dorada y brillante; perdió = apagada; guardó = neutra.
+        /// </summary>
+        private void RefreshHistory(GameSession session)
         {
-            if (session.History.Count == 0)
+            int count = session.History.Count;
+            historyText.gameObject.SetActive(count == 0);
+            if (count == 0)
             {
-                return "Aún no hay rondas.";
+                historyText.text = "Aún no hay rondas.";
             }
 
-            StringBuilder builder = new StringBuilder();
-            int shown = 0;
-            for (int i = session.History.Count - 1; i >= 0 && shown < HistoryLines; i--, shown++)
+            for (int slot = 0; slot < historySlots.Length; slot++)
             {
-                RoundResult round = session.History[i];
-                string outcome;
-                if (!round.IsBet)
+                int index = count - 1 - slot;
+                bool used = index >= 0;
+                historySlots[slot].gameObject.SetActive(used);
+                if (!used)
                 {
-                    outcome = "<color=#A9AECB>Guardó</color>";
+                    continue;
                 }
-                else if (round.Won)
+
+                RoundResult round = session.History[index];
+                Color background;
+                Color outline;
+                Color ink;
+                if (round.IsBet && round.Won)
                 {
-                    outcome = "<color=#F2CF7A>GANÓ</color>";
+                    background = Indigo;
+                    outline = GoldLine;
+                    ink = Gold;
+                }
+                else if (round.IsBet)
+                {
+                    background = DarkSlot;
+                    outline = FadedLine;
+                    ink = Faded;
                 }
                 else
                 {
-                    outcome = "<color=#E8798A>PERDIÓ</color>";
+                    background = DarkSlot;
+                    outline = FadedLine;
+                    ink = Ivory;
                 }
 
-                builder.Append('#').Append(round.RoundNumber).Append("  ")
-                    .Append(Labels.SymbolName(round.Symbol)).Append("  ")
-                    .Append(round.IsBet ? "Apuesta " + round.Stake : "Guardar").Append("  ")
-                    .Append(outcome).Append("  ")
-                    .Append(Labels.Signed(round.NetChange)).Append('\n');
+                historySlots[slot].color = background;
+                historyOutlines[slot].color = outline;
+                historyIcons[slot].sprite = IconSprite(round.Symbol);
+                historyIcons[slot].color = ink;
+                historyNumbers[slot].text = Labels.Signed(round.NetChange).Replace("-", "−");
+                historyNumbers[slot].color = ink;
             }
+        }
 
-            return builder.ToString();
+        private Sprite CardSprite(BackgroundSymbol symbol)
+        {
+            switch (symbol)
+            {
+                case BackgroundSymbol.Sun: return sunCard;
+                case BackgroundSymbol.Moon: return moonCard;
+                default: return eyeCard;
+            }
+        }
+
+        private Sprite IconSprite(BackgroundSymbol symbol)
+        {
+            switch (symbol)
+            {
+                case BackgroundSymbol.Sun: return sunIcon;
+                case BackgroundSymbol.Moon: return moonIcon;
+                default: return eyeIcon;
+            }
+        }
+
+        private static string CardName(BackgroundSymbol symbol)
+        {
+            switch (symbol)
+            {
+                case BackgroundSymbol.Sun: return "EL SOL";
+                case BackgroundSymbol.Moon: return "LA LUNA";
+                default: return "EL OJO";
+            }
+        }
+
+        /// <summary>10000 → "10.000" (separador de miles con punto, como en Colombia).</summary>
+        private static string FormatNumber(int value)
+        {
+            return value.ToString("#,0", CultureInfo.InvariantCulture).Replace(",", ".");
         }
     }
 }

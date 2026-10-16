@@ -1,0 +1,2069 @@
+fileFormatVersion: 2
+guid: ad110f213d29d304bafe0a247f29e65f
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 4229593187948157075
+    second: astrolabe_0
+  - first:
+      213: -5608786412267187254
+    second: astrolabe_1
+  - first:
+      213: -4432665310316543347
+    second: astrolabe_2
+  - first:
+      213: 9003947653099952207
+    second: astrolabe_3
+  - first:
+      213: 4904708737412786434
+    second: astrolabe_4
+  - first:
+      213: -3515741058296635270
+    second: astrolabe_5
+  - first:
+      213: -4663790642852289857
+    second: astrolabe_6
+  - first:
+      213: 6636165762364254375
+    second: astrolabe_7
+  - first:
+      213: 6200098800122243664
+    second: astrolabe_8
+  - first:
+      213: -2874474821905086424
+    second: astrolabe_9
+  - first:
+      213: 984008922175478089
+    second: astrolabe_10
+  - first:
+      213: -3713584743166391892
+    second: astrolabe_11
+  - first:
+      213: 4377204568806390447
+    second: astrolabe_12
+  - first:
+      213: -6480981744970529358
+    second: astrolabe_13
+  - first:
+      213: 4283336995113636616
+    second: astrolabe_14
+  - first:
+      213: -7002926749298368832
+    second: astrolabe_15
+  - first:
+      213: -8368487123585360253
+    second: astrolabe_16
+  - first:
+      213: -3969333187768766556
+    second: astrolabe_17
+  - first:
+      213: 7649391386153929109
+    second: astrolabe_18
+  - first:
+      213: -8084208981401774360
+    second: astrolabe_19
+  - first:
+      213: -7887216704102642191
+    second: astrolabe_20
+  - first:
+      213: 6892023499473696581
+    second: astrolabe_21
+  - first:
+      213: 3657943085191748447
+    second: astrolabe_22
+  - first:
+      213: 137819096629766765
+    second: astrolabe_23
+  - first:
+      213: -386842989340951428
+    second: astrolabe_24
+  - first:
+      213: -3395719410391686483
+    second: astrolabe_25
+  - first:
+      213: 1616764750228441687
+    second: astrolabe_26
+  - first:
+      213: -907706278028822632
+    second: astrolabe_27
+  - first:
+      213: 3221712673621252488
+    second: astrolabe_28
+  - first:
+      213: -2777285576902459113
+    second: astrolabe_29
+  - first:
+      213: 8615541792249308139
+    second: astrolabe_30
+  - first:
+      213: -429786875584827415
+    second: astrolabe_31
+  - first:
+      213: 5852731628722004858
+    second: astrolabe_32
+  - first:
+      213: -4985150508747458427
+    second: astrolabe_33
+  - first:
+      213: -6798791427539029056
+    second: astrolabe_34
+  - first:
+      213: -6385003129463989578
+    second: astrolabe_35
+  - first:
+      213: 8381998425856894706
+    second: astrolabe_36
+  - first:
+      213: -3534447043555589936
+    second: astrolabe_37
+  - first:
+      213: 1000388438965258931
+    second: astrolabe_38
+  - first:
+      213: 4538515364180892579
+    second: astrolabe_39
+  - first:
+      213: 3317641019590517198
+    second: astrolabe_40
+  - first:
+      213: 5194061299248768909
+    second: astrolabe_41
+  - first:
+      213: -8580641371193886954
+    second: astrolabe_42
+  - first:
+      213: 2525942258062346580
+    second: astrolabe_43
+  - first:
+      213: 8840602505397478200
+    second: astrolabe_44
+  - first:
+      213: 5337654292643690150
+    second: astrolabe_45
+  - first:
+      213: 7253892952963186961
+    second: astrolabe_46
+  - first:
+      213: -7503386586467067157
+    second: astrolabe_47
+  - first:
+      213: -5606694468417722819
+    second: astrolabe_48
+  - first:
+      213: 1324067569205961592
+    second: astrolabe_49
+  - first:
+      213: 5710150698532537021
+    second: astrolabe_50
+  - first:
+      213: 6522857895804681390
+    second: astrolabe_51
+  - first:
+      213: -8010000314309476025
+    second: astrolabe_52
+  - first:
+      213: 3584821573243284715
+    second: astrolabe_53
+  - first:
+      213: -4390612262128646072
+    second: astrolabe_54
+  - first:
+      213: -9152460284653464800
+    second: astrolabe_55
+  - first:
+      213: 2506195057838235063
+    second: astrolabe_56
+  - first:
+      213: -2776951202557472915
+    second: astrolabe_57
+  - first:
+      213: 4648182042330385733
+    second: astrolabe_58
+  - first:
+      213: -929310839482239254
+    second: astrolabe_59
+  - first:
+      213: 8064523445712873140
+    second: astrolabe_60
+  - first:
+      213: 7428211566745260609
+    second: astrolabe_61
+  - first:
+      213: 3459480895419191540
+    second: astrolabe_62
+  - first:
+      213: 4654146874969422675
+    second: astrolabe_63
+  - first:
+      213: -4912112652249213033
+    second: astrolabe_64
+  - first:
+      213: -1106211851700259109
+    second: astrolabe_65
+  - first:
+      213: -888890621388610610
+    second: astrolabe_66
+  - first:
+      213: 4561325177119074625
+    second: astrolabe_67
+  - first:
+      213: -7747343851047122716
+    second: astrolabe_68
+  - first:
+      213: 948067323997362195
+    second: astrolabe_69
+  - first:
+      213: -509754465715333140
+    second: astrolabe_70
+  - first:
+      213: -4230039341300004113
+    second: astrolabe_71
+  - first:
+      213: 2373663325214422240
+    second: astrolabe_72
+  - first:
+      213: -8872541079164468853
+    second: astrolabe_73
+  - first:
+      213: 2119761782856189256
+    second: astrolabe_74
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 1
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationMethod: 0
+  spriteTessellationDetail: -1
+  spriteGeometrySubdivision: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: astrolabe_0
+      rect:
+        serializedVersion: 2
+        x: 297
+        y: 981
+        width: 6
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 398df08589882ba30800000000000000
+      internalID: 4229593187948157075
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: astrolabe_1
+      rect:
+        serializedVersion: 2
+        x: 157
+        y: 157
+        width: 710
+        height: 777
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ac3d6c389769922b0800000000000000
+      internalID: -5608786412267187254
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: astrolabe_2
+      rect:
+        serializedVersion: 2
+        x: 413
+        y: 918
+        width: 7
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d82c262b2620c72c0800000000000000
+      internalID: -4432665310316543347
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: astrolabe_3
+      rect:
+        serializedVersion: 2
+        x: 432
+        y: 922
+        width: 7
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f481c3f7fa274fc70800000000000000
+      internalID: 9003947653099952207
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: astrolabe_4
+      rect:
+        serializedVersion: 2
+        x: 591
+        y: 921
+        width: 7
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2096e344c96011440800000000000000
+      internalID: 4904708737412786434
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: astrolabe_5
+      rect:
+        serializedVersion: 2
+        x: 374
+        y: 907
+        width: 7
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a7029f97224953fc0800000000000000
+      internalID: -3515741058296635270
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: astrolabe_6
+      rect:
+        serializedVersion: 2
+        x: 393
+        y: 913
+        width: 7
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fb2aff1ce13e64fb0800000000000000
+      internalID: -4663790642852289857
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: astrolabe_7
+      rect:
+        serializedVersion: 2
+        x: 630
+        y: 911
+        width: 7
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7a8a458d995681c50800000000000000
+      internalID: 6636165762364254375
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: astrolabe_8
+      rect:
+        serializedVersion: 2
+        x: 926
+        y: 910
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 05aac99520d2b0650800000000000000
+      internalID: 6200098800122243664
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: astrolabe_9
+      rect:
+        serializedVersion: 2
+        x: 355
+        y: 900
+        width: 7
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8280b8c0160db18d0800000000000000
+      internalID: -2874474821905086424
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: astrolabe_10
+      rect:
+        serializedVersion: 2
+        x: 649
+        y: 905
+        width: 7
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9499516b6e6e7ad00800000000000000
+      internalID: 984008922175478089
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: astrolabe_11
+      rect:
+        serializedVersion: 2
+        x: 337
+        y: 892
+        width: 7
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ca9c14cf952b67cc0800000000000000
+      internalID: -3713584743166391892
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: astrolabe_12
+      rect:
+        serializedVersion: 2
+        x: 668
+        y: 898
+        width: 7
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: faafbe82d54febc30800000000000000
+      internalID: 4377204568806390447
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: astrolabe_13
+      rect:
+        serializedVersion: 2
+        x: 319
+        y: 884
+        width: 7
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2b58d3fc07dee06a0800000000000000
+      internalID: -6480981744970529358
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: astrolabe_14
+      rect:
+        serializedVersion: 2
+        x: 686
+        y: 889
+        width: 7
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 803990f8d48717b30800000000000000
+      internalID: 4283336995113636616
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: astrolabe_15
+      rect:
+        serializedVersion: 2
+        x: 86
+        y: 880
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0ce5dff793b90de90800000000000000
+      internalID: -7002926749298368832
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: astrolabe_16
+      rect:
+        serializedVersion: 2
+        x: 301
+        y: 874
+        width: 7
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 38e934b9c492ddb80800000000000000
+      internalID: -8368487123585360253
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: astrolabe_17
+      rect:
+        serializedVersion: 2
+        x: 704
+        y: 881
+        width: 7
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4afafd30f781ae8c0800000000000000
+      internalID: -3969333187768766556
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: astrolabe_18
+      rect:
+        serializedVersion: 2
+        x: 721
+        y: 871
+        width: 7
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 59943afffe8182a60800000000000000
+      internalID: 7649391386153929109
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: astrolabe_19
+      rect:
+        serializedVersion: 2
+        x: 284
+        y: 864
+        width: 7
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8e6568d63ce1fcf80800000000000000
+      internalID: -8084208981401774360
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: astrolabe_20
+      rect:
+        serializedVersion: 2
+        x: 864
+        y: 732
+        width: 6
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1fd4f65223afa8290800000000000000
+      internalID: -7887216704102642191
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: astrolabe_21
+      rect:
+        serializedVersion: 2
+        x: 147
+        y: 721
+        width: 6
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 54736c57bd265af50800000000000000
+      internalID: 6892023499473696581
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: astrolabe_22
+      rect:
+        serializedVersion: 2
+        x: 874
+        y: 715
+        width: 7
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f5b5379fadf93c230800000000000000
+      internalID: 3657943085191748447
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: astrolabe_23
+      rect:
+        serializedVersion: 2
+        x: 137
+        y: 703
+        width: 6
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d6ae1e9fcb1a9e100800000000000000
+      internalID: 137819096629766765
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: astrolabe_24
+      rect:
+        serializedVersion: 2
+        x: 884
+        y: 698
+        width: 6
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c7c7b7cc958a1aaf0800000000000000
+      internalID: -386842989340951428
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: astrolabe_25
+      rect:
+        serializedVersion: 2
+        x: 128
+        y: 686
+        width: 6
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: da264b2003bffd0d0800000000000000
+      internalID: -3395719410391686483
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: astrolabe_26
+      rect:
+        serializedVersion: 2
+        x: 892
+        y: 680
+        width: 7
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 75a4dbe69f6ef6610800000000000000
+      internalID: 1616764750228441687
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: astrolabe_27
+      rect:
+        serializedVersion: 2
+        x: 120
+        y: 667
+        width: 6
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 89733b903fd2763f0800000000000000
+      internalID: -907706278028822632
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: astrolabe_28
+      rect:
+        serializedVersion: 2
+        x: 900
+        y: 661
+        width: 6
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 88991977b92d5bc20800000000000000
+      internalID: 3221712673621252488
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: astrolabe_29
+      rect:
+        serializedVersion: 2
+        x: 113
+        y: 649
+        width: 6
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 711c9e48b791579d0800000000000000
+      internalID: -2777285576902459113
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: astrolabe_30
+      rect:
+        serializedVersion: 2
+        x: 907
+        y: 642
+        width: 6
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: be36d8aec9d809770800000000000000
+      internalID: 8615541792249308139
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: astrolabe_31
+      rect:
+        serializedVersion: 2
+        x: 107
+        y: 630
+        width: 6
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9ef24af1d17190af0800000000000000
+      internalID: -429786875584827415
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: astrolabe_32
+      rect:
+        serializedVersion: 2
+        x: 913
+        y: 623
+        width: 6
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a732baf3864193150800000000000000
+      internalID: 5852731628722004858
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: astrolabe_33
+      rect:
+        serializedVersion: 2
+        x: 90
+        y: 492
+        width: 17
+        height: 125
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 588ff36560031dab0800000000000000
+      internalID: -4985150508747458427
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: astrolabe_34
+      rect:
+        serializedVersion: 2
+        x: 918
+        y: 604
+        width: 6
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0c3b09bd737d5a1a0800000000000000
+      internalID: -6798791427539029056
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: astrolabe_35
+      rect:
+        serializedVersion: 2
+        x: 57
+        y: 501
+        width: 6
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6ba9a82ab79e367a0800000000000000
+      internalID: -6385003129463989578
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: astrolabe_36
+      rect:
+        serializedVersion: 2
+        x: 922
+        y: 507
+        width: 12
+        height: 84
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2f665199827d25470800000000000000
+      internalID: 8381998425856894706
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: astrolabe_37
+      rect:
+        serializedVersion: 2
+        x: 91
+        y: 452
+        width: 8
+        height: 26
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0d08073e32f13fec0800000000000000
+      internalID: -3534447043555589936
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: astrolabe_38
+      rect:
+        serializedVersion: 2
+        x: 927
+        y: 467
+        width: 7
+        height: 27
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3ba8ee52cf712ed00800000000000000
+      internalID: 1000388438965258931
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: astrolabe_39
+      rect:
+        serializedVersion: 2
+        x: 96
+        y: 432
+        width: 6
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3ab97a97dab0cfe30800000000000000
+      internalID: 4538515364180892579
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: astrolabe_40
+      rect:
+        serializedVersion: 2
+        x: 912
+        y: 388
+        width: 18
+        height: 66
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ec125f00ee0aa0e20800000000000000
+      internalID: 3317641019590517198
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: astrolabe_41
+      rect:
+        serializedVersion: 2
+        x: 976
+        y: 420
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d87a35b7b33051840800000000000000
+      internalID: 5194061299248768909
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: astrolabe_42
+      rect:
+        serializedVersion: 2
+        x: 100
+        y: 412
+        width: 6
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 617b7f492207be880800000000000000
+      internalID: -8580641371193886954
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: astrolabe_43
+      rect:
+        serializedVersion: 2
+        x: 105
+        y: 393
+        width: 6
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 45944f6c913fd0320800000000000000
+      internalID: 2525942258062346580
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: astrolabe_44
+      rect:
+        serializedVersion: 2
+        x: 111
+        y: 374
+        width: 6
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 83325ae932120ba70800000000000000
+      internalID: 8840602505397478200
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: astrolabe_45
+      rect:
+        serializedVersion: 2
+        x: 905
+        y: 369
+        width: 6
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6a6bdde8c48231a40800000000000000
+      internalID: 5337654292643690150
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: astrolabe_46
+      rect:
+        serializedVersion: 2
+        x: 118
+        y: 355
+        width: 6
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 111841c35310ba460800000000000000
+      internalID: 7253892952963186961
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: astrolabe_47
+      rect:
+        serializedVersion: 2
+        x: 898
+        y: 350
+        width: 6
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bea133d77ad9ed790800000000000000
+      internalID: -7503386586467067157
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: astrolabe_48
+      rect:
+        serializedVersion: 2
+        x: 126
+        y: 336
+        width: 6
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d3660d526150132b0800000000000000
+      internalID: -5606694468417722819
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: astrolabe_49
+      rect:
+        serializedVersion: 2
+        x: 890
+        y: 332
+        width: 6
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 873e2216078006210800000000000000
+      internalID: 1324067569205961592
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: astrolabe_50
+      rect:
+        serializedVersion: 2
+        x: 134
+        y: 318
+        width: 7
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: db20bff7ec78e3f40800000000000000
+      internalID: 5710150698532537021
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: astrolabe_51
+      rect:
+        serializedVersion: 2
+        x: 881
+        y: 314
+        width: 6
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: eac3ac752b8d58a50800000000000000
+      internalID: 6522857895804681390
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: astrolabe_52
+      rect:
+        serializedVersion: 2
+        x: 144
+        y: 301
+        width: 6
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 74101d62723c6d090800000000000000
+      internalID: -8010000314309476025
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: astrolabe_53
+      rect:
+        serializedVersion: 2
+        x: 872
+        y: 297
+        width: 6
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: beca2584a38dfb130800000000000000
+      internalID: 3584821573243284715
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: astrolabe_54
+      rect:
+        serializedVersion: 2
+        x: 154
+        y: 284
+        width: 6
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8480959f8696113c0800000000000000
+      internalID: -4390612262128646072
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: astrolabe_55
+      rect:
+        serializedVersion: 2
+        x: 734
+        y: 154
+        width: 7
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0231c58ecddebf080800000000000000
+      internalID: -9152460284653464800
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: astrolabe_56
+      rect:
+        serializedVersion: 2
+        x: 856
+        y: 140
+        width: 126
+        height: 67
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7bd9940702bc7c220800000000000000
+      internalID: 2506195057838235063
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: astrolabe_57
+      rect:
+        serializedVersion: 2
+        x: 296
+        y: 146
+        width: 7
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d6fc7fc18994679d0800000000000000
+      internalID: -2776951202557472915
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: astrolabe_58
+      rect:
+        serializedVersion: 2
+        x: 716
+        y: 144
+        width: 8
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 54dc37cb0f8a18040800000000000000
+      internalID: 4648182042330385733
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: astrolabe_59
+      rect:
+        serializedVersion: 2
+        x: 314
+        y: 137
+        width: 7
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ae6bdb617bc6a13f0800000000000000
+      internalID: -929310839482239254
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: astrolabe_60
+      rect:
+        serializedVersion: 2
+        x: 699
+        y: 134
+        width: 7
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4b66680a851faef60800000000000000
+      internalID: 8064523445712873140
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: astrolabe_61
+      rect:
+        serializedVersion: 2
+        x: 332
+        y: 128
+        width: 7
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1429c48401f461760800000000000000
+      internalID: 7428211566745260609
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: astrolabe_62
+      rect:
+        serializedVersion: 2
+        x: 681
+        y: 126
+        width: 7
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4f016b69b8b820030800000000000000
+      internalID: 3459480895419191540
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: astrolabe_63
+      rect:
+        serializedVersion: 2
+        x: 137
+        y: 121
+        width: 6
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 35bfb0f8ce9d69040800000000000000
+      internalID: 4654146874969422675
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: astrolabe_64
+      rect:
+        serializedVersion: 2
+        x: 350
+        y: 120
+        width: 7
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 797dbf9719ba4dbb0800000000000000
+      internalID: -4912112652249213033
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: astrolabe_65
+      rect:
+        serializedVersion: 2
+        x: 662
+        y: 118
+        width: 7
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bd6341d8e22f5a0f0800000000000000
+      internalID: -1106211851700259109
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: astrolabe_66
+      rect:
+        serializedVersion: 2
+        x: 369
+        y: 113
+        width: 7
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ec3a4fb70b60aa3f0800000000000000
+      internalID: -888890621388610610
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: astrolabe_67
+      rect:
+        serializedVersion: 2
+        x: 388
+        y: 102
+        width: 26
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1496a37e4151d4f30800000000000000
+      internalID: 4561325177119074625
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: astrolabe_68
+      rect:
+        serializedVersion: 2
+        x: 644
+        y: 111
+        width: 7
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4e8878d80d7eb7490800000000000000
+      internalID: -7747343851047122716
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: astrolabe_69
+      rect:
+        serializedVersion: 2
+        x: 605
+        y: 100
+        width: 7
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 31894064536382d00800000000000000
+      internalID: 948067323997362195
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: astrolabe_70
+      rect:
+        serializedVersion: 2
+        x: 625
+        y: 105
+        width: 7
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ce75e54a30dfce8f0800000000000000
+      internalID: -509754465715333140
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: astrolabe_71
+      rect:
+        serializedVersion: 2
+        x: 427
+        y: 92
+        width: 46
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: feac2eb71a1eb45c0800000000000000
+      internalID: -4230039341300004113
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: astrolabe_72
+      rect:
+        serializedVersion: 2
+        x: 486
+        y: 90
+        width: 87
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0e437c3d732f0f020800000000000000
+      internalID: 2373663325214422240
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: astrolabe_73
+      rect:
+        serializedVersion: 2
+        x: 586
+        y: 96
+        width: 7
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b814751b5e66ed480800000000000000
+      internalID: -8872541079164468853
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: astrolabe_74
+      rect:
+        serializedVersion: 2
+        x: 757
+        y: 31
+        width: 6
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 845879b4c18ea6d10800000000000000
+      internalID: 2119761782856189256
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 5e97eb03825dee720800000000000000
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      astrolabe_0: 4229593187948157075
+      astrolabe_1: -5608786412267187254
+      astrolabe_10: 984008922175478089
+      astrolabe_11: -3713584743166391892
+      astrolabe_12: 4377204568806390447
+      astrolabe_13: -6480981744970529358
+      astrolabe_14: 4283336995113636616
+      astrolabe_15: -7002926749298368832
+      astrolabe_16: -8368487123585360253
+      astrolabe_17: -3969333187768766556
+      astrolabe_18: 7649391386153929109
+      astrolabe_19: -8084208981401774360
+      astrolabe_2: -4432665310316543347
+      astrolabe_20: -7887216704102642191
+      astrolabe_21: 6892023499473696581
+      astrolabe_22: 3657943085191748447
+      astrolabe_23: 137819096629766765
+      astrolabe_24: -386842989340951428
+      astrolabe_25: -3395719410391686483
+      astrolabe_26: 1616764750228441687
+      astrolabe_27: -907706278028822632
+      astrolabe_28: 3221712673621252488
+      astrolabe_29: -2777285576902459113
+      astrolabe_3: 9003947653099952207
+      astrolabe_30: 8615541792249308139
+      astrolabe_31: -429786875584827415
+      astrolabe_32: 5852731628722004858
+      astrolabe_33: -4985150508747458427
+      astrolabe_34: -6798791427539029056
+      astrolabe_35: -6385003129463989578
+      astrolabe_36: 8381998425856894706
+      astrolabe_37: -3534447043555589936
+      astrolabe_38: 1000388438965258931
+      astrolabe_39: 4538515364180892579
+      astrolabe_4: 4904708737412786434
+      astrolabe_40: 3317641019590517198
+      astrolabe_41: 5194061299248768909
+      astrolabe_42: -8580641371193886954
+      astrolabe_43: 2525942258062346580
+      astrolabe_44: 8840602505397478200
+      astrolabe_45: 5337654292643690150
+      astrolabe_46: 7253892952963186961
+      astrolabe_47: -7503386586467067157
+      astrolabe_48: -5606694468417722819
+      astrolabe_49: 1324067569205961592
+      astrolabe_5: -3515741058296635270
+      astrolabe_50: 5710150698532537021
+      astrolabe_51: 6522857895804681390
+      astrolabe_52: -8010000314309476025
+      astrolabe_53: 3584821573243284715
+      astrolabe_54: -4390612262128646072
+      astrolabe_55: -9152460284653464800
+      astrolabe_56: 2506195057838235063
+      astrolabe_57: -2776951202557472915
+      astrolabe_58: 4648182042330385733
+      astrolabe_59: -929310839482239254
+      astrolabe_6: -4663790642852289857
+      astrolabe_60: 8064523445712873140
+      astrolabe_61: 7428211566745260609
+      astrolabe_62: 3459480895419191540
+      astrolabe_63: 4654146874969422675
+      astrolabe_64: -4912112652249213033
+      astrolabe_65: -1106211851700259109
+      astrolabe_66: -888890621388610610
+      astrolabe_67: 4561325177119074625
+      astrolabe_68: -7747343851047122716
+      astrolabe_69: 948067323997362195
+      astrolabe_7: 6636165762364254375
+      astrolabe_70: -509754465715333140
+      astrolabe_71: -4230039341300004113
+      astrolabe_72: 2373663325214422240
+      astrolabe_73: -8872541079164468853
+      astrolabe_74: 2119761782856189256
+      astrolabe_8: 6200098800122243664
+      astrolabe_9: -2874474821905086424
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

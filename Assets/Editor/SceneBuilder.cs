@@ -13,8 +13,10 @@ namespace OnePercent.EditorTools
     /// crea Assets/Settings/GameConfig.asset, conecta todas las referencias y la añade al Build Settings.
     /// Se ejecuta desde el menú: 1% de Probabilidad > Construir escena.
     ///
-    /// Etapa 1 (móvil): diseño en VERTICAL (referencia 1080x1920), zona segura (muescas),
-    /// orientación fija en vertical, paleta "tarot nocturno" y fuentes propias si están en Assets/Fonts.
+    /// Etapa 1 (móvil): diseño en VERTICAL (referencia 1080x1920), zona segura, orientación vertical, fuentes.
+    /// Etapa 2 (identidad visual): cartas del símbolo, moneda, registro con mini cartas, paneles y botones
+    /// redondeados, fondo con astrolabio y motivos sutiles. Las imágenes viven en Assets/Art y este script
+    /// las configura solo como sprites antes de construir. Si alguna falta, se usa un color liso.
     /// IMPORTANTE: este script es la única fuente de verdad de la interfaz. Los cambios hechos a mano
     /// en la escena se pierden al volver a ejecutar "Construir escena".
     /// </summary>
@@ -22,6 +24,7 @@ namespace OnePercent.EditorTools
     {
         private const string ScenePath = "Assets/Scenes/Main.unity";
         private const string ConfigPath = "Assets/Settings/GameConfig.asset";
+        private const string ArtFolder = "Assets/Art";
 
         // Fuentes opcionales (Google Fonts, licencia OFL). Si no existen se usa la fuente por defecto de Unity.
         private const string BodyFontPath = "Assets/Fonts/Figtree-Regular.ttf";
@@ -37,6 +40,7 @@ namespace OnePercent.EditorTools
         private static readonly Color ButtonCarmine = Hex(0x7A2234);
         private static readonly Color ButtonGray = Hex(0x353C6A);
         private static readonly Color Gold = Hex(0xF2CF7A);
+        private static readonly Color GoldLine = Hex(0xC9A55A);
         private static readonly Color Ivory = Hex(0xEDE6D3);
         private static readonly Color Mist = Hex(0xA9AECB);
         private static readonly Color DebugCyan = new Color(0.55f, 0.90f, 0.95f);
@@ -44,6 +48,23 @@ namespace OnePercent.EditorTools
         private static Font bodyFont;
         private static Font boldFont;
         private static Font titleFont;
+
+        private static Sprite panelSprite;
+        private static Sprite buttonSprite;
+        private static Sprite outlineSprite;
+        private static Sprite minicardSprite;
+        private static Sprite coinSprite;
+        private static Sprite glowSprite;
+        private static Sprite astrolabeSprite;
+        private static Sprite motifEyeSprite;
+        private static Sprite motifMoonSprite;
+        private static Sprite projectileSprite;
+        private static Sprite sunCard;
+        private static Sprite moonCard;
+        private static Sprite eyeCard;
+        private static Sprite sunIcon;
+        private static Sprite moonIcon;
+        private static Sprite eyeIcon;
 
         [MenuItem("1% de Probabilidad/Construir escena")]
         public static void BuildScene()
@@ -54,6 +75,8 @@ namespace OnePercent.EditorTools
             }
 
             LoadFonts();
+            PrepareArt();
+            LoadSprites();
             ConfigurePortrait();
             GameConfig config = LoadOrCreateConfig();
             EnsureFolder("Assets", "Scenes");
@@ -99,7 +122,7 @@ namespace OnePercent.EditorTools
                 "Aceptar");
         }
 
-        // ------------------------------------------------------------------ Escena base
+        // ------------------------------------------------------------------ Recursos
 
         private static void LoadFonts()
         {
@@ -135,6 +158,86 @@ namespace OnePercent.EditorTools
             }
         }
 
+        /// <summary>
+        /// Configura todas las imágenes de Assets/Art como sprites de interfaz: sin mipmaps, con transparencia
+        /// y, en las que terminan en "_9slice", con bordes para estirarse sin deformar las esquinas.
+        /// </summary>
+        private static void PrepareArt()
+        {
+            AssetDatabase.Refresh();
+            if (!AssetDatabase.IsValidFolder(ArtFolder))
+            {
+                Debug.LogWarning("[1% de Probabilidad] No existe " + ArtFolder + ". La interfaz se construirá con colores lisos.");
+                return;
+            }
+
+            string[] guids = AssetDatabase.FindAssets("t:Texture2D", new[] { ArtFolder });
+            for (int i = 0; i < guids.Length; i++)
+            {
+                string path = AssetDatabase.GUIDToAssetPath(guids[i]);
+                TextureImporter importer = AssetImporter.GetAtPath(path) as TextureImporter;
+                if (importer == null)
+                {
+                    continue;
+                }
+
+                string fileName = System.IO.Path.GetFileNameWithoutExtension(path);
+                Vector4 border = Vector4.zero;
+                if (fileName == "minicard_9slice")
+                {
+                    border = new Vector4(20f, 20f, 20f, 20f);
+                }
+                else if (fileName.EndsWith("_9slice"))
+                {
+                    border = new Vector4(32f, 32f, 32f, 32f);
+                }
+
+                bool upToDate = importer.textureType == TextureImporterType.Sprite &&
+                                importer.spriteImportMode == SpriteImportMode.Single &&
+                                !importer.mipmapEnabled &&
+                                importer.alphaIsTransparency &&
+                                importer.spriteBorder == border;
+                if (upToDate)
+                {
+                    continue;
+                }
+
+                importer.textureType = TextureImporterType.Sprite;
+                importer.spriteImportMode = SpriteImportMode.Single;
+                importer.mipmapEnabled = false;
+                importer.alphaIsTransparency = true;
+                importer.wrapMode = TextureWrapMode.Clamp;
+                importer.filterMode = FilterMode.Bilinear;
+                importer.spriteBorder = border;
+                importer.SaveAndReimport();
+            }
+        }
+
+        private static void LoadSprites()
+        {
+            panelSprite = LoadSprite("UI/panel_9slice.png");
+            buttonSprite = LoadSprite("UI/button_9slice.png");
+            outlineSprite = LoadSprite("UI/outline_9slice.png");
+            minicardSprite = LoadSprite("UI/minicard_9slice.png");
+            coinSprite = LoadSprite("Icons/coin.png");
+            glowSprite = LoadSprite("Cards/card_glow.png");
+            astrolabeSprite = LoadSprite("Background/astrolabe.png");
+            motifEyeSprite = LoadSprite("Background/motif_eye.png");
+            motifMoonSprite = LoadSprite("Background/motif_moon.png");
+            projectileSprite = LoadSprite("Shield/projectile.png");
+            sunCard = LoadSprite("Cards/card_sol.png");
+            moonCard = LoadSprite("Cards/card_luna.png");
+            eyeCard = LoadSprite("Cards/card_ojo.png");
+            sunIcon = LoadSprite("Icons/sym_sol.png");
+            moonIcon = LoadSprite("Icons/sym_luna.png");
+            eyeIcon = LoadSprite("Icons/sym_ojo.png");
+        }
+
+        private static Sprite LoadSprite(string relativePath)
+        {
+            return AssetDatabase.LoadAssetAtPath<Sprite>(ArtFolder + "/" + relativePath);
+        }
+
         /// <summary>El juego es solo vertical: sin giro automático a horizontal.</summary>
         private static void ConfigurePortrait()
         {
@@ -167,6 +270,8 @@ namespace OnePercent.EditorTools
                 AssetDatabase.CreateFolder(parent, name);
             }
         }
+
+        // ------------------------------------------------------------------ Escena base
 
         private static void SetupCamera()
         {
@@ -242,74 +347,148 @@ namespace OnePercent.EditorTools
             Transform root = panel.transform;
             TableScreen screen = panel.gameObject.AddComponent<TableScreen>();
 
-            // Barra superior: monedas y estadísticas.
-            Text coins = NewText("CoinsText", root, V(0.05f, 0.905f), V(0.66f, 0.975f),
-                "Monedas: 100", 72, TextAnchor.MiddleLeft, Gold, boldFont);
+            // Fondo: astrolabio detrás de la carta y dos motivos apenas visibles. No cambian entre rondas.
+            RectTransform ringsArea = NewRect("BackgroundRingsArea", root, V(-0.20f, 0.47f), V(1.20f, 0.95f));
+            NewFitted("BackgroundRings", ringsArea, astrolabeSprite, 1f, Color.white);
+            NewDecor("MotifEye", root, V(0.03f, 0.600f), V(0.17f, 0.660f), motifEyeSprite, 0.16f);
+            NewDecor("MotifMoon", root, V(0.85f, 0.790f), V(0.97f, 0.850f), motifMoonSprite, 0.16f);
+
+            // Barra superior: moneda, cantidad y estadísticas.
+            NewDecor("CoinIcon", root, V(0.05f, 0.912f), V(0.13f, 0.968f), coinSprite, 1f);
+            float coinsLeft = coinSprite != null ? 0.145f : 0.05f;
+            Text coins = NewText("CoinsText", root, V(coinsLeft, 0.905f), V(0.66f, 0.975f),
+                "100", 80, TextAnchor.MiddleLeft, Gold, boldFont);
             coins.resizeTextForBestFit = true;
             coins.resizeTextMinSize = 40;
-            coins.resizeTextMaxSize = 72;
+            coins.resizeTextMaxSize = 80;
 
             Text unusedLabel;
             Button statsButton = NewButton("StatsButton", root, V(0.68f, 0.915f), V(0.95f, 0.965f),
-                "Estadísticas", 36, ButtonBlue, out unusedLabel);
+                "Estadísticas", 34, ButtonBlue, out unusedLabel);
 
-            Text goal = NewText("GoalText", root, V(0.05f, 0.865f), V(0.95f, 0.900f),
-                "Meta: 10000", 36, TextAnchor.MiddleLeft, Mist, bodyFont);
+            Text goal = NewText("GoalText", root, V(0.05f, 0.868f), V(0.95f, 0.900f),
+                "Meta  10.000", 34, TextAnchor.MiddleLeft, Mist, bodyFont);
 
-            // La carta del símbolo: un contenedor y, dentro, la imagen con proporción de carta (0,7).
+            // La carta del símbolo: resplandor detrás y la carta con su proporción (0,7), con el nombre dentro.
+            RectTransform glowArea = NewRect("CardGlowArea", root, V(0.05f, 0.520f), V(0.95f, 0.895f));
+            NewFitted("CardGlow", glowArea, glowSprite, 0.75f, Color.white);
+
             RectTransform symbolArea = NewRect("SymbolArea", root, V(0.20f, 0.565f), V(0.80f, 0.850f));
-            Image symbolImage = NewImage("SymbolImage", symbolArea, V(0f, 0f), V(1f, 1f), Color.gray);
+            Image symbolImage = NewImage("SymbolImage", symbolArea, V(0f, 0f), V(1f, 1f),
+                sunCard != null ? Color.white : Color.gray);
+            symbolImage.sprite = sunCard;
+            symbolImage.raycastTarget = false;
             AspectRatioFitter fitter = symbolImage.gameObject.AddComponent<AspectRatioFitter>();
             fitter.aspectMode = AspectRatioFitter.AspectMode.FitInParent;
             fitter.aspectRatio = 0.7f;
 
-            Text symbolCaption = NewText("SymbolCaptionText", root, V(0.05f, 0.528f), V(0.95f, 0.562f),
-                "Símbolo del fondo", 34, TextAnchor.MiddleCenter, Ivory, bodyFont);
+            Text symbolCaption = NewText("CardNameText", symbolImage.transform, V(0.08f, 0.05f), V(0.92f, 0.19f),
+                "EL SOL", 44, TextAnchor.MiddleCenter, Ivory, titleFont);
+            symbolCaption.resizeTextForBestFit = true;
+            symbolCaption.resizeTextMinSize = 18;
+            symbolCaption.resizeTextMaxSize = 44;
 
-            Image messagePanel = NewImage("MessagePanel", root, V(0.05f, 0.405f), V(0.95f, 0.518f), Ink);
-            Text message = NewText("MessageText", messagePanel.transform, V(0.04f, 0.06f), V(0.96f, 0.94f),
+            Text message = NewText("MessageText", root, V(0.06f, 0.455f), V(0.94f, 0.555f),
                 string.Empty, 40, TextAnchor.MiddleCenter, Ivory, bodyFont);
             message.resizeTextForBestFit = true;
-            message.resizeTextMinSize = 26;
+            message.resizeTextMinSize = 24;
             message.resizeTextMaxSize = 40;
 
-            NewText("HistoryTitle", root, V(0.05f, 0.368f), V(0.95f, 0.400f),
-                "Historial", 32, TextAnchor.MiddleLeft, Mist, titleFont);
-            Image historyPanel = NewImage("HistoryPanel", root, V(0.05f, 0.215f), V(0.95f, 0.366f), Ink);
-            Text history = NewText("HistoryText", historyPanel.transform, V(0.04f, 0.05f), V(0.96f, 0.95f),
-                string.Empty, 30, TextAnchor.UpperLeft, Ivory, bodyFont);
-            history.resizeTextForBestFit = true;
-            history.resizeTextMinSize = 22;
-            history.resizeTextMaxSize = 30;
-
             // Solo visible al pulsar Debug (y el botón Debug solo existe en compilaciones de desarrollo).
-            Text debug = NewText("DebugText", root, V(0.05f, 0.160f), V(0.95f, 0.212f),
+            Text debug = NewText("DebugText", root, V(0.05f, 0.405f), V(0.95f, 0.452f),
                 string.Empty, 24, TextAnchor.UpperLeft, DebugCyan, bodyFont);
             debug.resizeTextForBestFit = true;
             debug.resizeTextMinSize = 16;
             debug.resizeTextMaxSize = 24;
 
+            // Registro: 8 mini cartas, la más reciente a la izquierda.
+            NewText("HistoryTitle", root, V(0.05f, 0.357f), V(0.95f, 0.392f),
+                "REGISTRO", 30, TextAnchor.MiddleLeft, Mist, titleFont);
+            RectTransform row = NewRect("HistoryRow", root, V(0.05f, 0.255f), V(0.95f, 0.352f));
+            Text emptyText = NewText("HistoryEmptyText", row, V(0f, 0f), V(1f, 1f),
+                "Aún no hay rondas.", 30, TextAnchor.MiddleLeft, Mist, bodyFont);
+
+            const int slotCount = 8;
+            const float gap = 0.012f;
+            float slotWidth = (1f - gap * (slotCount - 1)) / slotCount;
+            Image[] slots = new Image[slotCount];
+            Image[] outlines = new Image[slotCount];
+            Image[] icons = new Image[slotCount];
+            Text[] numbers = new Text[slotCount];
+            for (int i = 0; i < slotCount; i++)
+            {
+                float x0 = i * (slotWidth + gap);
+                Image slot = NewImage("Slot" + (i + 1), row, V(x0, 0f), V(x0 + slotWidth, 1f), Night);
+                slot.raycastTarget = false;
+                if (minicardSprite != null)
+                {
+                    slot.sprite = minicardSprite;
+                    slot.type = Image.Type.Sliced;
+                }
+
+                Image outline = NewImage("Outline", slot.transform, V(0f, 0f), V(1f, 1f), GoldLine);
+                outline.raycastTarget = false;
+                if (outlineSprite != null)
+                {
+                    outline.sprite = outlineSprite;
+                    outline.type = Image.Type.Sliced;
+                    outline.fillCenter = false;
+                    outline.pixelsPerUnitMultiplier = 2f;
+                }
+                else
+                {
+                    outline.enabled = false;
+                }
+
+                Image icon = NewImage("Icon", slot.transform, V(0.18f, 0.42f), V(0.82f, 0.88f), Gold);
+                icon.sprite = sunIcon;
+                icon.preserveAspect = true;
+                icon.raycastTarget = false;
+
+                Text number = NewText("Number", slot.transform, V(0.02f, 0.06f), V(0.98f, 0.40f),
+                    "+19", 30, TextAnchor.MiddleCenter, Gold, boldFont);
+                number.resizeTextForBestFit = true;
+                number.resizeTextMinSize = 16;
+                number.resizeTextMaxSize = 30;
+
+                slot.gameObject.SetActive(false);
+                slots[i] = slot;
+                outlines[i] = outline;
+                icons[i] = icon;
+                numbers[i] = number;
+            }
+
             // Botones de decisión en la zona del pulgar.
             Text saveLabel;
             Text moderateLabel;
             Text allInLabel;
-            Button saveButton = NewButton("SaveButton", root, V(0.05f, 0.045f), V(0.335f, 0.155f),
+            Button saveButton = NewButton("SaveButton", root, V(0.05f, 0.050f), V(0.335f, 0.205f),
                 "GUARDAR", 40, ButtonJade, out saveLabel);
-            Button moderateButton = NewButton("ModerateButton", root, V(0.3575f, 0.045f), V(0.6425f, 0.155f),
+            Button moderateButton = NewButton("ModerateButton", root, V(0.3575f, 0.050f), V(0.6425f, 0.205f),
                 "APOSTAR 20", 40, ButtonAmber, out moderateLabel);
-            Button allInButton = NewButton("AllInButton", root, V(0.665f, 0.045f), V(0.95f, 0.155f),
+            Button allInButton = NewButton("AllInButton", root, V(0.665f, 0.050f), V(0.95f, 0.205f),
                 "APOSTAR 100", 40, ButtonCarmine, out allInLabel);
 
-            Button debugButton = NewButton("DebugButton", root, V(0.05f, 0.002f), V(0.25f, 0.038f),
+            Button debugButton = NewButton("DebugButton", root, V(0.05f, 0.004f), V(0.25f, 0.040f),
                 "Debug", 26, ButtonGray, out unusedLabel);
 
             Assign(screen, "coinsText", coins);
             Assign(screen, "goalText", goal);
             Assign(screen, "messageText", message);
-            Assign(screen, "historyText", history);
+            Assign(screen, "historyText", emptyText);
             Assign(screen, "symbolCaptionText", symbolCaption);
             Assign(screen, "debugText", debug);
             Assign(screen, "symbolImage", symbolImage);
+            AssignOptional(screen, "sunCard", sunCard);
+            AssignOptional(screen, "moonCard", moonCard);
+            AssignOptional(screen, "eyeCard", eyeCard);
+            AssignArray(screen, "historySlots", slots);
+            AssignArray(screen, "historyOutlines", outlines);
+            AssignArray(screen, "historyIcons", icons);
+            AssignArray(screen, "historyNumbers", numbers);
+            AssignOptional(screen, "sunIcon", sunIcon);
+            AssignOptional(screen, "moonIcon", moonIcon);
+            AssignOptional(screen, "eyeIcon", eyeIcon);
             Assign(screen, "saveButton", saveButton);
             Assign(screen, "moderateButton", moderateButton);
             Assign(screen, "allInButton", allInButton);
@@ -344,7 +523,7 @@ namespace OnePercent.EditorTools
 
             for (int i = 0; i < 3; i++)
             {
-                Image lane = NewImage("Lane" + (i + 1), root, V(laneStart[i], 0.20f), V(laneStart[i] + laneWidth, 0.87f), Ink);
+                Image lane = NewPanel("Lane" + (i + 1), root, V(laneStart[i], 0.20f), V(laneStart[i] + laneWidth, 0.87f));
                 lanes[i] = lane.rectTransform;
 
                 Text unusedLabel;
@@ -354,7 +533,7 @@ namespace OnePercent.EditorTools
             }
 
             // El panel de introducción/resultado va al final para dibujarse encima de los carriles.
-            Image overlay = NewImage("Overlay", root, V(0.05f, 0.20f), V(0.95f, 0.87f), new Color(0.03f, 0.04f, 0.10f, 0.94f));
+            Image overlay = NewPanel("Overlay", root, V(0.05f, 0.20f), V(0.95f, 0.87f));
             Text info = NewText("InfoText", overlay.transform, V(0.06f, 0.22f), V(0.94f, 0.96f),
                 string.Empty, 38, TextAnchor.MiddleCenter, Ivory, bodyFont);
             info.resizeTextForBestFit = true;
@@ -376,6 +555,7 @@ namespace OnePercent.EditorTools
             Assign(screen, "continueButton", cont);
             AssignArray(screen, "laneAreas", lanes);
             AssignArray(screen, "laneButtons", laneButtons);
+            AssignOptional(screen, "projectileSprite", projectileSprite);
 
             return screen;
         }
@@ -413,11 +593,11 @@ namespace OnePercent.EditorTools
             return screen;
         }
 
-        /// <summary>Bloque de fondo oscuro con un texto que se reduce solo si no cabe.</summary>
+        /// <summary>Bloque de panel con un texto que se reduce solo si no cabe.</summary>
         private static Text NewSection(string name, Transform parent, Vector2 anchorMin, Vector2 anchorMax)
         {
-            Image block = NewImage(name, parent, anchorMin, anchorMax, Ink);
-            Text text = NewText("Text", block.transform, V(0.04f, 0.04f), V(0.96f, 0.96f),
+            Image block = NewPanel(name, parent, anchorMin, anchorMax);
+            Text text = NewText("Text", block.transform, V(0.05f, 0.05f), V(0.95f, 0.95f),
                 string.Empty, 30, TextAnchor.UpperLeft, Ivory, bodyFont);
             text.resizeTextForBestFit = true;
             text.resizeTextMinSize = 20;
@@ -432,6 +612,9 @@ namespace OnePercent.EditorTools
             Image panel = NewImage("EndPanel", parent, V(0f, 0f), V(1f, 1f), Night);
             Transform root = panel.transform;
             EndScreen screen = panel.gameObject.AddComponent<EndScreen>();
+
+            RectTransform ringsArea = NewRect("BackgroundRingsArea", root, V(-0.20f, 0.45f), V(1.20f, 0.97f));
+            NewFitted("BackgroundRings", ringsArea, astrolabeSprite, 1f, Color.white);
 
             Text title = NewText("TitleText", root, V(0.05f, 0.64f), V(0.95f, 0.78f),
                 "FIN", 104, TextAnchor.MiddleCenter, Ivory, titleFont);
@@ -490,6 +673,52 @@ namespace OnePercent.EditorTools
             return image;
         }
 
+        /// <summary>Panel redondeado con borde dorado fino. Sin la imagen, un rectángulo de color tinta.</summary>
+        private static Image NewPanel(string name, Transform parent, Vector2 anchorMin, Vector2 anchorMax)
+        {
+            Image image = NewImage(name, parent, anchorMin, anchorMax, Ink);
+            if (panelSprite != null)
+            {
+                image.sprite = panelSprite;
+                image.type = Image.Type.Sliced;
+                image.color = Color.white;
+            }
+
+            return image;
+        }
+
+        /// <summary>Imagen decorativa que conserva su proporción y no bloquea toques. Si no hay sprite, no se crea.</summary>
+        private static Image NewDecor(string name, Transform parent, Vector2 anchorMin, Vector2 anchorMax, Sprite sprite, float alpha)
+        {
+            if (sprite == null)
+            {
+                return null;
+            }
+
+            Image image = NewImage(name, parent, anchorMin, anchorMax, new Color(1f, 1f, 1f, alpha));
+            image.sprite = sprite;
+            image.preserveAspect = true;
+            image.raycastTarget = false;
+            return image;
+        }
+
+        /// <summary>Imagen que llena su contenedor manteniendo una proporción fija (ancho / alto).</summary>
+        private static Image NewFitted(string name, Transform parent, Sprite sprite, float aspect, Color color)
+        {
+            if (sprite == null)
+            {
+                return null;
+            }
+
+            Image image = NewImage(name, parent, V(0f, 0f), V(1f, 1f), color);
+            image.sprite = sprite;
+            image.raycastTarget = false;
+            AspectRatioFitter fitter = image.gameObject.AddComponent<AspectRatioFitter>();
+            fitter.aspectMode = AspectRatioFitter.AspectMode.FitInParent;
+            fitter.aspectRatio = aspect;
+            return image;
+        }
+
         private static Text NewText(string name, Transform parent, Vector2 anchorMin, Vector2 anchorMax,
             string content, int size, TextAnchor alignment, Color color, Font textFont)
         {
@@ -507,12 +736,40 @@ namespace OnePercent.EditorTools
             return text;
         }
 
+        /// <summary>
+        /// Botón redondeado del color indicado, con un borde dorado fino encima.
+        /// Al pulsarlo se oscurece un poco; desactivado se ve mucho más apagado.
+        /// </summary>
         private static Button NewButton(string name, Transform parent, Vector2 anchorMin, Vector2 anchorMax,
             string label, int size, Color color, out Text labelText)
         {
             Image image = NewImage(name, parent, anchorMin, anchorMax, color);
+            if (buttonSprite != null)
+            {
+                image.sprite = buttonSprite;
+                image.type = Image.Type.Sliced;
+            }
+
             Button button = image.gameObject.AddComponent<Button>();
             button.targetGraphic = image;
+
+            ColorBlock colors = button.colors;
+            colors.normalColor = Color.white;
+            colors.highlightedColor = new Color(0.94f, 0.94f, 0.94f, 1f);
+            colors.pressedColor = new Color(0.75f, 0.75f, 0.75f, 1f);
+            colors.selectedColor = Color.white;
+            colors.disabledColor = new Color(0.32f, 0.34f, 0.45f, 1f);
+            colors.fadeDuration = 0.08f;
+            button.colors = colors;
+
+            if (outlineSprite != null)
+            {
+                Image outline = NewImage("Outline", image.transform, V(0f, 0f), V(1f, 1f), new Color(GoldLine.r, GoldLine.g, GoldLine.b, 0.55f));
+                outline.sprite = outlineSprite;
+                outline.type = Image.Type.Sliced;
+                outline.fillCenter = false;
+                outline.raycastTarget = false;
+            }
 
             labelText = NewText("Label", image.transform, V(0.05f, 0.06f), V(0.95f, 0.94f),
                 label, size, TextAnchor.MiddleCenter, Ivory, boldFont);
@@ -539,6 +796,17 @@ namespace OnePercent.EditorTools
 
             property.objectReferenceValue = value;
             serialized.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        /// <summary>Como Assign, pero sin error si el valor falta (imágenes opcionales).</summary>
+        private static void AssignOptional(UnityEngine.Object target, string field, UnityEngine.Object value)
+        {
+            if (value == null)
+            {
+                return;
+            }
+
+            Assign(target, field, value);
         }
 
         private static void AssignArray(UnityEngine.Object target, string field, UnityEngine.Object[] values)
