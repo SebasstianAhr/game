@@ -1,6 +1,7 @@
 using System;
 using System.Text;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 namespace OnePercent
@@ -58,6 +59,16 @@ namespace OnePercent
         public void Hide()
         {
             gameObject.SetActive(false);
+        }
+
+        private void Update()
+        {
+            // El botón "atrás" de Android llega como la tecla Escape. Aquí equivale a pulsar VOLVER.
+            Keyboard keyboard = Keyboard.current;
+            if (keyboard != null && keyboard.escapeKey.wasPressedThisFrame && BackRequested != null)
+            {
+                BackRequested();
+            }
         }
 
         private void OnResetClicked()
@@ -125,7 +136,7 @@ namespace OnePercent
 
             if (bets >= minSamples)
             {
-                builder.Append("  <color=#6BE675>[DESCUBIERTO]</color>");
+                builder.Append("  <color=#F2CF7A>[DESCUBIERTO]</color>");
             }
 
             builder.Append('\n');

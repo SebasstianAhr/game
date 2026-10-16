@@ -109,7 +109,7 @@ namespace OnePercent
             infoText.text =
                 "¡EMERGENCIA!\nTe quedan " + coinsLeft + " monedas. Esta es tu última oportunidad.\n\n" +
                 "Caerán proyectiles por 3 carriles.\n" +
-                "Pulsa BLOQUEAR en un carril cuando el proyectil esté dentro de la zona verde.\n" +
+                "Pulsa BLOQUEAR en un carril cuando el proyectil esté dentro de la zona del escudo (la parte baja, marcada con una línea dorada).\n" +
                 "Cada bloqueo te da " + config.coinsPerBlock + " monedas (máximo " + config.maxMinigameReward + ").\n" +
                 "Tienes " + config.minigameDuration.ToString("0", CultureInfo.InvariantCulture) + " segundos.";
 
@@ -169,7 +169,7 @@ namespace OnePercent
             go.transform.SetParent(laneAreas[lane], false);
 
             Image image = go.GetComponent<Image>();
-            image.color = new Color(1f, 0.35f, 0.30f);
+            image.color = new Color(0.761f, 0.220f, 0.310f); // carmín #C2384F
             image.raycastTarget = false;
 
             RectTransform rect = go.GetComponent<RectTransform>();
@@ -307,12 +307,26 @@ namespace OnePercent
                     go.transform.SetAsFirstSibling();
 
                     Image image = go.GetComponent<Image>();
-                    image.color = new Color(0.30f, 0.80f, 0.40f, 0.35f);
+                    image.color = new Color(0.118f, 0.173f, 0.400f); // zona del escudo: azul #1E2C66
                     image.raycastTarget = false;
 
                     zones[i] = go.GetComponent<RectTransform>();
                     zones[i].offsetMin = Vector2.zero;
                     zones[i].offsetMax = Vector2.zero;
+
+                    // Línea dorada que marca el borde superior de la zona.
+                    GameObject line = new GameObject("BlockZoneEdge", typeof(RectTransform), typeof(Image));
+                    line.layer = gameObject.layer;
+                    line.transform.SetParent(zones[i], false);
+                    Image lineImage = line.GetComponent<Image>();
+                    lineImage.color = new Color(0.949f, 0.812f, 0.478f); // oro #F2CF7A
+                    lineImage.raycastTarget = false;
+                    RectTransform lineRect = line.GetComponent<RectTransform>();
+                    lineRect.anchorMin = new Vector2(0f, 1f);
+                    lineRect.anchorMax = new Vector2(1f, 1f);
+                    lineRect.pivot = new Vector2(0.5f, 1f);
+                    lineRect.sizeDelta = new Vector2(0f, 6f);
+                    lineRect.anchoredPosition = Vector2.zero;
                 }
 
                 zones[i].anchorMin = new Vector2(0f, 0f);

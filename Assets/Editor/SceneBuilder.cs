@@ -12,26 +12,38 @@ namespace OnePercent.EditorTools
     /// Construye automáticamente la escena Assets/Scenes/Main.unity con toda la interfaz,
     /// crea Assets/Settings/GameConfig.asset, conecta todas las referencias y la añade al Build Settings.
     /// Se ejecuta desde el menú: 1% de Probabilidad > Construir escena.
+    ///
+    /// Etapa 1 (móvil): diseño en VERTICAL (referencia 1080x1920), zona segura (muescas),
+    /// orientación fija en vertical, paleta "tarot nocturno" y fuentes propias si están en Assets/Fonts.
+    /// IMPORTANTE: este script es la única fuente de verdad de la interfaz. Los cambios hechos a mano
+    /// en la escena se pierden al volver a ejecutar "Construir escena".
     /// </summary>
     public static class SceneBuilder
     {
         private const string ScenePath = "Assets/Scenes/Main.unity";
-        private const string SettingsFolder = "Assets/Settings";
         private const string ConfigPath = "Assets/Settings/GameConfig.asset";
 
-        private static readonly Color CameraBg = new Color(0.05f, 0.06f, 0.10f);
-        private static readonly Color PanelBg = new Color(0.08f, 0.09f, 0.14f);
-        private static readonly Color PanelLight = new Color(0.14f, 0.16f, 0.23f);
-        private static readonly Color LaneBg = new Color(0.12f, 0.14f, 0.20f);
-        private static readonly Color ButtonBlue = new Color(0.20f, 0.35f, 0.65f);
-        private static readonly Color ButtonGreen = new Color(0.20f, 0.55f, 0.35f);
-        private static readonly Color ButtonOrange = new Color(0.80f, 0.45f, 0.15f);
-        private static readonly Color ButtonRed = new Color(0.70f, 0.20f, 0.25f);
-        private static readonly Color ButtonGray = new Color(0.30f, 0.33f, 0.40f);
-        private static readonly Color Gold = new Color(1f, 0.84f, 0.30f);
-        private static readonly Color Soft = new Color(0.80f, 0.85f, 0.92f);
+        // Fuentes opcionales (Google Fonts, licencia OFL). Si no existen se usa la fuente por defecto de Unity.
+        private const string BodyFontPath = "Assets/Fonts/Figtree-Regular.ttf";
+        private const string BoldFontPath = "Assets/Fonts/Figtree-Bold.ttf";
+        private const string TitleFontPath = "Assets/Fonts/Cinzel-Bold.ttf";
 
-        private static Font font;
+        // Paleta "tarot nocturno" (ver guía de estilo).
+        private static readonly Color Night = Hex(0x0B0F24);
+        private static readonly Color Ink = Hex(0x121839);
+        private static readonly Color ButtonBlue = Hex(0x1E2C66);
+        private static readonly Color ButtonJade = Hex(0x24564C);
+        private static readonly Color ButtonAmber = Hex(0x8A541D);
+        private static readonly Color ButtonCarmine = Hex(0x7A2234);
+        private static readonly Color ButtonGray = Hex(0x353C6A);
+        private static readonly Color Gold = Hex(0xF2CF7A);
+        private static readonly Color Ivory = Hex(0xEDE6D3);
+        private static readonly Color Mist = Hex(0xA9AECB);
+        private static readonly Color DebugCyan = new Color(0.55f, 0.90f, 0.95f);
+
+        private static Font bodyFont;
+        private static Font boldFont;
+        private static Font titleFont;
 
         [MenuItem("1% de Probabilidad/Construir escena")]
         public static void BuildScene()
@@ -41,7 +53,8 @@ namespace OnePercent.EditorTools
                 return;
             }
 
-            font = LoadFont();
+            LoadFonts();
+            ConfigurePortrait();
             GameConfig config = LoadOrCreateConfig();
             EnsureFolder("Assets", "Scenes");
 
@@ -51,10 +64,14 @@ namespace OnePercent.EditorTools
             CreateEventSystem();
             Canvas canvas = CreateCanvas();
 
-            TableScreen table = BuildTablePanel(canvas.transform);
-            ShieldMinigameScreen shield = BuildShieldPanel(canvas.transform);
-            StatsScreen stats = BuildStatsPanel(canvas.transform);
-            EndScreen end = BuildEndPanel(canvas.transform);
+            // Todo el contenido va dentro de SafeArea para no quedar debajo de la muesca o la barra de gestos.
+            RectTransform safeArea = NewRect("SafeArea", canvas.transform, V(0f, 0f), V(1f, 1f));
+            safeArea.gameObject.AddComponent<SafeAreaFitter>();
+
+            TableScreen table = BuildTablePanel(safeArea);
+            ShieldMinigameScreen shield = BuildShieldPanel(safeArea);
+            StatsScreen stats = BuildStatsPanel(safeArea);
+            EndScreen end = BuildEndPanel(safeArea);
 
             GameObject managerObject = new GameObject("GameManager");
             GameManager manager = managerObject.AddComponent<GameManager>();
@@ -84,20 +101,48 @@ namespace OnePercent.EditorTools
 
         // ------------------------------------------------------------------ Escena base
 
-        private static Font LoadFont()
+        private static void LoadFonts()
         {
             Font builtIn = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-            if (builtIn == null)
-            {
-                builtIn = Resources.GetBuiltinResource<Font>("Arial.ttf");
-            }
-
             if (builtIn == null)
             {
                 builtIn = Font.CreateDynamicFontFromOSFont("Arial", 16);
             }
 
-            return builtIn;
+            bodyFont = AssetDatabase.LoadAssetAtPath<Font>(BodyFontPath);
+            boldFont = AssetDatabase.LoadAssetAtPath<Font>(BoldFontPath);
+            titleFont = AssetDatabase.LoadAssetAtPath<Font>(TitleFontPath);
+
+            if (bodyFont == null || boldFont == null || titleFont == null)
+            {
+                Debug.LogWarning("[1% de Probabilidad] Faltan fuentes en Assets/Fonts (Figtree-Regular.ttf, Figtree-Bold.ttf, " +
+                                 "Cinzel-Bold.ttf). Se usará la fuente por defecto donde falten.");
+            }
+
+            if (bodyFont == null)
+            {
+                bodyFont = builtIn;
+            }
+
+            if (boldFont == null)
+            {
+                boldFont = bodyFont;
+            }
+
+            if (titleFont == null)
+            {
+                titleFont = boldFont;
+            }
+        }
+
+        /// <summary>El juego es solo vertical: sin giro automático a horizontal.</summary>
+        private static void ConfigurePortrait()
+        {
+            PlayerSettings.defaultInterfaceOrientation = UIOrientation.Portrait;
+            PlayerSettings.allowedAutorotateToPortrait = true;
+            PlayerSettings.allowedAutorotateToPortraitUpsideDown = false;
+            PlayerSettings.allowedAutorotateToLandscapeLeft = false;
+            PlayerSettings.allowedAutorotateToLandscapeRight = false;
         }
 
         private static GameConfig LoadOrCreateConfig()
@@ -140,9 +185,10 @@ namespace OnePercent.EditorTools
                 cameraObject.AddComponent<AudioListener>();
             }
 
+            // El color de la cámara rellena lo que queda fuera de la zona segura: igual que el fondo.
             camera.orthographic = true;
             camera.clearFlags = CameraClearFlags.SolidColor;
-            camera.backgroundColor = CameraBg;
+            camera.backgroundColor = Night;
             camera.transform.position = new Vector3(0f, 0f, -10f);
         }
 
@@ -178,9 +224,10 @@ namespace OnePercent.EditorTools
             Canvas canvas = canvasObject.GetComponent<Canvas>();
             canvas.renderMode = RenderMode.ScreenSpaceOverlay;
 
+            // Referencia vertical 1080x1920. Todas las medidas de texto de abajo están en esta escala.
             CanvasScaler scaler = canvasObject.GetComponent<CanvasScaler>();
             scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-            scaler.referenceResolution = new Vector2(1280f, 720f);
+            scaler.referenceResolution = new Vector2(1080f, 1920f);
             scaler.screenMatchMode = CanvasScaler.ScreenMatchMode.MatchWidthOrHeight;
             scaler.matchWidthOrHeight = 0.5f;
 
@@ -191,48 +238,70 @@ namespace OnePercent.EditorTools
 
         private static TableScreen BuildTablePanel(Transform parent)
         {
-            Image panel = NewImage("TablePanel", parent, V(0f, 0f), V(1f, 1f), PanelBg);
+            Image panel = NewImage("TablePanel", parent, V(0f, 0f), V(1f, 1f), Night);
             Transform root = panel.transform;
             TableScreen screen = panel.gameObject.AddComponent<TableScreen>();
 
-            Text coins = NewText("CoinsText", root, V(0.03f, 0.86f), V(0.40f, 0.98f),
-                "Monedas: 100", 40, TextAnchor.MiddleLeft, Gold);
-            Text goal = NewText("GoalText", root, V(0.40f, 0.86f), V(0.76f, 0.98f),
-                "Meta: 10000", 24, TextAnchor.MiddleCenter, Soft);
+            // Barra superior: monedas y estadísticas.
+            Text coins = NewText("CoinsText", root, V(0.05f, 0.905f), V(0.66f, 0.975f),
+                "Monedas: 100", 72, TextAnchor.MiddleLeft, Gold, boldFont);
+            coins.resizeTextForBestFit = true;
+            coins.resizeTextMinSize = 40;
+            coins.resizeTextMaxSize = 72;
 
             Text unusedLabel;
-            Button statsButton = NewButton("StatsButton", root, V(0.78f, 0.88f), V(0.97f, 0.97f),
-                "Estadísticas", 24, ButtonBlue, out unusedLabel);
+            Button statsButton = NewButton("StatsButton", root, V(0.68f, 0.915f), V(0.95f, 0.965f),
+                "Estadísticas", 36, ButtonBlue, out unusedLabel);
 
-            Image symbolImage = NewImage("SymbolImage", root, V(0.04f, 0.50f), V(0.27f, 0.82f), Color.gray);
-            Text symbolCaption = NewText("SymbolCaptionText", root, V(0.02f, 0.43f), V(0.29f, 0.50f),
-                "Símbolo del fondo", 20, TextAnchor.MiddleCenter, Soft);
+            Text goal = NewText("GoalText", root, V(0.05f, 0.865f), V(0.95f, 0.900f),
+                "Meta: 10000", 36, TextAnchor.MiddleLeft, Mist, bodyFont);
 
-            Image messagePanel = NewImage("MessagePanel", root, V(0.30f, 0.45f), V(0.67f, 0.82f), PanelLight);
-            Text message = NewText("MessageText", messagePanel.transform, V(0.04f, 0.04f), V(0.96f, 0.96f),
-                string.Empty, 26, TextAnchor.MiddleCenter, Color.white);
+            // La carta del símbolo: un contenedor y, dentro, la imagen con proporción de carta (0,7).
+            RectTransform symbolArea = NewRect("SymbolArea", root, V(0.20f, 0.565f), V(0.80f, 0.850f));
+            Image symbolImage = NewImage("SymbolImage", symbolArea, V(0f, 0f), V(1f, 1f), Color.gray);
+            AspectRatioFitter fitter = symbolImage.gameObject.AddComponent<AspectRatioFitter>();
+            fitter.aspectMode = AspectRatioFitter.AspectMode.FitInParent;
+            fitter.aspectRatio = 0.7f;
 
-            Text debug = NewText("DebugText", root, V(0.03f, 0.28f), V(0.67f, 0.42f),
-                string.Empty, 18, TextAnchor.UpperLeft, new Color(0.55f, 0.90f, 0.95f));
+            Text symbolCaption = NewText("SymbolCaptionText", root, V(0.05f, 0.528f), V(0.95f, 0.562f),
+                "Símbolo del fondo", 34, TextAnchor.MiddleCenter, Ivory, bodyFont);
 
-            NewText("HistoryTitle", root, V(0.70f, 0.80f), V(0.97f, 0.86f),
-                "Historial", 24, TextAnchor.MiddleCenter, Soft);
-            Image historyPanel = NewImage("HistoryPanel", root, V(0.70f, 0.28f), V(0.97f, 0.80f), PanelLight);
-            Text history = NewText("HistoryText", historyPanel.transform, V(0.05f, 0.03f), V(0.95f, 0.97f),
-                string.Empty, 18, TextAnchor.UpperLeft, Color.white);
+            Image messagePanel = NewImage("MessagePanel", root, V(0.05f, 0.405f), V(0.95f, 0.518f), Ink);
+            Text message = NewText("MessageText", messagePanel.transform, V(0.04f, 0.06f), V(0.96f, 0.94f),
+                string.Empty, 40, TextAnchor.MiddleCenter, Ivory, bodyFont);
+            message.resizeTextForBestFit = true;
+            message.resizeTextMinSize = 26;
+            message.resizeTextMaxSize = 40;
 
+            NewText("HistoryTitle", root, V(0.05f, 0.368f), V(0.95f, 0.400f),
+                "Historial", 32, TextAnchor.MiddleLeft, Mist, titleFont);
+            Image historyPanel = NewImage("HistoryPanel", root, V(0.05f, 0.215f), V(0.95f, 0.366f), Ink);
+            Text history = NewText("HistoryText", historyPanel.transform, V(0.04f, 0.05f), V(0.96f, 0.95f),
+                string.Empty, 30, TextAnchor.UpperLeft, Ivory, bodyFont);
+            history.resizeTextForBestFit = true;
+            history.resizeTextMinSize = 22;
+            history.resizeTextMaxSize = 30;
+
+            // Solo visible al pulsar Debug (y el botón Debug solo existe en compilaciones de desarrollo).
+            Text debug = NewText("DebugText", root, V(0.05f, 0.160f), V(0.95f, 0.212f),
+                string.Empty, 24, TextAnchor.UpperLeft, DebugCyan, bodyFont);
+            debug.resizeTextForBestFit = true;
+            debug.resizeTextMinSize = 16;
+            debug.resizeTextMaxSize = 24;
+
+            // Botones de decisión en la zona del pulgar.
             Text saveLabel;
             Text moderateLabel;
             Text allInLabel;
-            Button saveButton = NewButton("SaveButton", root, V(0.03f, 0.08f), V(0.33f, 0.27f),
-                "GUARDAR", 26, ButtonGreen, out saveLabel);
-            Button moderateButton = NewButton("ModerateButton", root, V(0.35f, 0.08f), V(0.65f, 0.27f),
-                "APOSTAR 20", 26, ButtonOrange, out moderateLabel);
-            Button allInButton = NewButton("AllInButton", root, V(0.67f, 0.08f), V(0.97f, 0.27f),
-                "APOSTAR 100", 26, ButtonRed, out allInLabel);
+            Button saveButton = NewButton("SaveButton", root, V(0.05f, 0.045f), V(0.335f, 0.155f),
+                "GUARDAR", 40, ButtonJade, out saveLabel);
+            Button moderateButton = NewButton("ModerateButton", root, V(0.3575f, 0.045f), V(0.6425f, 0.155f),
+                "APOSTAR 20", 40, ButtonAmber, out moderateLabel);
+            Button allInButton = NewButton("AllInButton", root, V(0.665f, 0.045f), V(0.95f, 0.155f),
+                "APOSTAR 100", 40, ButtonCarmine, out allInLabel);
 
-            Button debugButton = NewButton("DebugButton", root, V(0.03f, 0.01f), V(0.14f, 0.06f),
-                "Debug", 16, ButtonGray, out unusedLabel);
+            Button debugButton = NewButton("DebugButton", root, V(0.05f, 0.002f), V(0.25f, 0.038f),
+                "Debug", 26, ButtonGray, out unusedLabel);
 
             Assign(screen, "coinsText", coins);
             Assign(screen, "goalText", goal);
@@ -257,43 +326,47 @@ namespace OnePercent.EditorTools
 
         private static ShieldMinigameScreen BuildShieldPanel(Transform parent)
         {
-            Image panel = NewImage("ShieldPanel", parent, V(0f, 0f), V(1f, 1f), PanelBg);
+            Image panel = NewImage("ShieldPanel", parent, V(0f, 0f), V(1f, 1f), Night);
             Transform root = panel.transform;
             ShieldMinigameScreen screen = panel.gameObject.AddComponent<ShieldMinigameScreen>();
 
-            Text timer = NewText("TimerText", root, V(0.04f, 0.87f), V(0.30f, 0.97f),
-                "Tiempo: 10.0", 28, TextAnchor.MiddleLeft, Soft);
-            NewText("TitleText", root, V(0.30f, 0.88f), V(0.70f, 0.98f),
-                "EL ESCUDO", 40, TextAnchor.MiddleCenter, Gold);
-            Text score = NewText("ScoreText", root, V(0.70f, 0.87f), V(0.96f, 0.97f),
-                "Bloqueos: 0", 28, TextAnchor.MiddleRight, Soft);
+            NewText("TitleText", root, V(0.05f, 0.930f), V(0.95f, 0.985f),
+                "EL ESCUDO", 64, TextAnchor.MiddleCenter, Gold, titleFont);
+            Text timer = NewText("TimerText", root, V(0.05f, 0.885f), V(0.48f, 0.925f),
+                "Tiempo: 10.0", 38, TextAnchor.MiddleLeft, Ivory, boldFont);
+            Text score = NewText("ScoreText", root, V(0.50f, 0.885f), V(0.95f, 0.925f),
+                "Bloqueos: 0", 38, TextAnchor.MiddleRight, Gold, boldFont);
 
-            float[] laneStart = { 0.10f, 0.40f, 0.70f };
+            float[] laneStart = { 0.05f, 0.3667f, 0.6833f };
+            const float laneWidth = 0.2667f;
             RectTransform[] lanes = new RectTransform[3];
             Button[] laneButtons = new Button[3];
 
             for (int i = 0; i < 3; i++)
             {
-                Image lane = NewImage("Lane" + (i + 1), root, V(laneStart[i], 0.18f), V(laneStart[i] + 0.20f, 0.84f), LaneBg);
+                Image lane = NewImage("Lane" + (i + 1), root, V(laneStart[i], 0.20f), V(laneStart[i] + laneWidth, 0.87f), Ink);
                 lanes[i] = lane.rectTransform;
 
                 Text unusedLabel;
                 laneButtons[i] = NewButton("BlockButton" + (i + 1), root,
-                    V(laneStart[i], 0.04f), V(laneStart[i] + 0.20f, 0.16f),
-                    "BLOQUEAR", 26, ButtonBlue, out unusedLabel);
+                    V(laneStart[i], 0.06f), V(laneStart[i] + laneWidth, 0.18f),
+                    "BLOQUEAR", 36, ButtonBlue, out unusedLabel);
             }
 
             // El panel de introducción/resultado va al final para dibujarse encima de los carriles.
-            Image overlay = NewImage("Overlay", root, V(0.08f, 0.17f), V(0.92f, 0.85f), new Color(0f, 0f, 0f, 0.88f));
-            Text info = NewText("InfoText", overlay.transform, V(0.03f, 0.28f), V(0.97f, 0.97f),
-                string.Empty, 24, TextAnchor.MiddleCenter, Color.white);
+            Image overlay = NewImage("Overlay", root, V(0.05f, 0.20f), V(0.95f, 0.87f), new Color(0.03f, 0.04f, 0.10f, 0.94f));
+            Text info = NewText("InfoText", overlay.transform, V(0.06f, 0.22f), V(0.94f, 0.96f),
+                string.Empty, 38, TextAnchor.MiddleCenter, Ivory, bodyFont);
+            info.resizeTextForBestFit = true;
+            info.resizeTextMinSize = 24;
+            info.resizeTextMaxSize = 38;
 
             Text startLabel;
-            Button start = NewButton("StartButton", overlay.transform, V(0.33f, 0.05f), V(0.67f, 0.22f),
-                "COMENZAR", 28, ButtonGreen, out startLabel);
+            Button start = NewButton("StartButton", overlay.transform, V(0.15f, 0.05f), V(0.85f, 0.16f),
+                "COMENZAR", 44, ButtonJade, out startLabel);
             Text continueLabel;
-            Button cont = NewButton("ContinueButton", overlay.transform, V(0.33f, 0.05f), V(0.67f, 0.22f),
-                "CONTINUAR", 28, ButtonGreen, out continueLabel);
+            Button cont = NewButton("ContinueButton", overlay.transform, V(0.15f, 0.05f), V(0.85f, 0.16f),
+                "CONTINUAR", 44, ButtonJade, out continueLabel);
 
             Assign(screen, "timerText", timer);
             Assign(screen, "scoreText", score);
@@ -311,31 +384,24 @@ namespace OnePercent.EditorTools
 
         private static StatsScreen BuildStatsPanel(Transform parent)
         {
-            Image panel = NewImage("StatsPanel", parent, V(0f, 0f), V(1f, 1f), PanelBg);
+            Image panel = NewImage("StatsPanel", parent, V(0f, 0f), V(1f, 1f), Night);
             Transform root = panel.transform;
             StatsScreen screen = panel.gameObject.AddComponent<StatsScreen>();
 
-            NewText("TitleText", root, V(0.10f, 0.90f), V(0.90f, 0.99f),
-                "LOGROS Y ESTADÍSTICAS", 38, TextAnchor.MiddleCenter, Gold);
+            NewText("TitleText", root, V(0.05f, 0.930f), V(0.95f, 0.985f),
+                "LOGROS Y ESTADÍSTICAS", 54, TextAnchor.MiddleCenter, Gold, titleFont);
 
-            Image statsPanel = NewImage("StatsColumn", root, V(0.03f, 0.16f), V(0.34f, 0.89f), PanelLight);
-            Text stats = NewText("StatsText", statsPanel.transform, V(0.05f, 0.03f), V(0.95f, 0.97f),
-                string.Empty, 20, TextAnchor.UpperLeft, Color.white);
-
-            Image patternsPanel = NewImage("PatternsColumn", root, V(0.355f, 0.16f), V(0.675f, 0.89f), PanelLight);
-            Text patterns = NewText("PatternsText", patternsPanel.transform, V(0.05f, 0.03f), V(0.95f, 0.97f),
-                string.Empty, 20, TextAnchor.UpperLeft, Color.white);
-
-            Image achievementsPanel = NewImage("AchievementsColumn", root, V(0.69f, 0.16f), V(0.97f, 0.89f), PanelLight);
-            Text achievements = NewText("AchievementsText", achievementsPanel.transform, V(0.05f, 0.03f), V(0.95f, 0.97f),
-                string.Empty, 20, TextAnchor.UpperLeft, Color.white);
+            // En vertical, las tres columnas pasan a ser tres bloques apilados.
+            Text stats = NewSection("StatsBlock", root, V(0.05f, 0.705f), V(0.95f, 0.920f));
+            Text patterns = NewSection("PatternsBlock", root, V(0.05f, 0.430f), V(0.95f, 0.695f));
+            Text achievements = NewSection("AchievementsBlock", root, V(0.05f, 0.125f), V(0.95f, 0.420f));
 
             Text backLabel;
-            Button back = NewButton("BackButton", root, V(0.03f, 0.03f), V(0.30f, 0.13f),
-                "VOLVER", 26, ButtonBlue, out backLabel);
+            Button back = NewButton("BackButton", root, V(0.05f, 0.03f), V(0.48f, 0.105f),
+                "VOLVER", 40, ButtonBlue, out backLabel);
             Text resetLabel;
-            Button reset = NewButton("ResetButton", root, V(0.69f, 0.03f), V(0.97f, 0.13f),
-                "Borrar progreso", 22, ButtonRed, out resetLabel);
+            Button reset = NewButton("ResetButton", root, V(0.52f, 0.03f), V(0.95f, 0.105f),
+                "Borrar progreso", 34, ButtonCarmine, out resetLabel);
 
             Assign(screen, "statsText", stats);
             Assign(screen, "patternsText", patterns);
@@ -347,25 +413,40 @@ namespace OnePercent.EditorTools
             return screen;
         }
 
+        /// <summary>Bloque de fondo oscuro con un texto que se reduce solo si no cabe.</summary>
+        private static Text NewSection(string name, Transform parent, Vector2 anchorMin, Vector2 anchorMax)
+        {
+            Image block = NewImage(name, parent, anchorMin, anchorMax, Ink);
+            Text text = NewText("Text", block.transform, V(0.04f, 0.04f), V(0.96f, 0.96f),
+                string.Empty, 30, TextAnchor.UpperLeft, Ivory, bodyFont);
+            text.resizeTextForBestFit = true;
+            text.resizeTextMinSize = 20;
+            text.resizeTextMaxSize = 30;
+            return text;
+        }
+
         // ------------------------------------------------------------------ Victoria / Derrota
 
         private static EndScreen BuildEndPanel(Transform parent)
         {
-            Image panel = NewImage("EndPanel", parent, V(0f, 0f), V(1f, 1f), new Color(0.05f, 0.07f, 0.12f, 1f));
+            Image panel = NewImage("EndPanel", parent, V(0f, 0f), V(1f, 1f), Night);
             Transform root = panel.transform;
             EndScreen screen = panel.gameObject.AddComponent<EndScreen>();
 
-            Text title = NewText("TitleText", root, V(0.10f, 0.62f), V(0.90f, 0.85f),
-                "FIN", 64, TextAnchor.MiddleCenter, Color.white);
-            Text summary = NewText("SummaryText", root, V(0.15f, 0.33f), V(0.85f, 0.60f),
-                string.Empty, 28, TextAnchor.UpperCenter, Soft);
+            Text title = NewText("TitleText", root, V(0.05f, 0.64f), V(0.95f, 0.78f),
+                "FIN", 104, TextAnchor.MiddleCenter, Ivory, titleFont);
+            title.resizeTextForBestFit = true;
+            title.resizeTextMinSize = 60;
+            title.resizeTextMaxSize = 104;
+            Text summary = NewText("SummaryText", root, V(0.08f, 0.36f), V(0.92f, 0.62f),
+                string.Empty, 42, TextAnchor.UpperCenter, Ivory, bodyFont);
 
             Text newGameLabel;
-            Button newGame = NewButton("NewGameButton", root, V(0.18f, 0.12f), V(0.48f, 0.26f),
-                "NUEVA PARTIDA", 28, ButtonGreen, out newGameLabel);
+            Button newGame = NewButton("NewGameButton", root, V(0.10f, 0.20f), V(0.90f, 0.29f),
+                "NUEVA PARTIDA", 44, ButtonJade, out newGameLabel);
             Text statsLabel;
-            Button stats = NewButton("StatsButton", root, V(0.52f, 0.12f), V(0.82f, 0.26f),
-                "ESTADÍSTICAS", 28, ButtonBlue, out statsLabel);
+            Button stats = NewButton("StatsButton", root, V(0.10f, 0.08f), V(0.90f, 0.17f),
+                "ESTADÍSTICAS", 44, ButtonBlue, out statsLabel);
 
             Assign(screen, "titleText", title);
             Assign(screen, "summaryText", summary);
@@ -380,6 +461,11 @@ namespace OnePercent.EditorTools
         private static Vector2 V(float x, float y)
         {
             return new Vector2(x, y);
+        }
+
+        private static Color Hex(int rgb)
+        {
+            return new Color(((rgb >> 16) & 0xFF) / 255f, ((rgb >> 8) & 0xFF) / 255f, (rgb & 0xFF) / 255f, 1f);
         }
 
         private static RectTransform NewRect(string name, Transform parent, Vector2 anchorMin, Vector2 anchorMax)
@@ -405,11 +491,11 @@ namespace OnePercent.EditorTools
         }
 
         private static Text NewText(string name, Transform parent, Vector2 anchorMin, Vector2 anchorMax,
-            string content, int size, TextAnchor alignment, Color color)
+            string content, int size, TextAnchor alignment, Color color, Font textFont)
         {
             RectTransform rect = NewRect(name, parent, anchorMin, anchorMax);
             Text text = rect.gameObject.AddComponent<Text>();
-            text.font = font;
+            text.font = textFont != null ? textFont : bodyFont;
             text.text = content;
             text.fontSize = size;
             text.alignment = alignment;
@@ -428,10 +514,10 @@ namespace OnePercent.EditorTools
             Button button = image.gameObject.AddComponent<Button>();
             button.targetGraphic = image;
 
-            labelText = NewText("Label", image.transform, V(0.03f, 0.05f), V(0.97f, 0.95f),
-                label, size, TextAnchor.MiddleCenter, Color.white);
+            labelText = NewText("Label", image.transform, V(0.05f, 0.06f), V(0.95f, 0.94f),
+                label, size, TextAnchor.MiddleCenter, Ivory, boldFont);
             labelText.resizeTextForBestFit = true;
-            labelText.resizeTextMinSize = 10;
+            labelText.resizeTextMinSize = 18;
             labelText.resizeTextMaxSize = size;
             return button;
         }

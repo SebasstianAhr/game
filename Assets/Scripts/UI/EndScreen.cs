@@ -50,7 +50,7 @@ namespace OnePercent
             if (outcome == GameOutcome.Victory)
             {
                 titleText.text = "¡VICTORIA!";
-                titleText.color = new Color(0.42f, 0.90f, 0.46f);
+                titleText.color = new Color(0.949f, 0.812f, 0.478f); // oro #F2CF7A
                 summaryText.text = "Alcanzaste " + config.goalCoins + " monedas y compraste tu libertad.\n\n" +
                                    "Rondas jugadas: " + session.Round + "\n" +
                                    "Capital final: " + session.Coins;
@@ -58,7 +58,7 @@ namespace OnePercent
             else
             {
                 titleText.text = "BANCARROTA";
-                titleText.color = new Color(1f, 0.42f, 0.42f);
+                titleText.color = new Color(0.886f, 0.361f, 0.439f); // carmín claro #E25C70
                 summaryText.text = "Te quedaste sin monedas.\n\n" +
                                    "Rondas jugadas: " + session.Round + "\n" +
                                    "Mayor capital de esta partida: " + session.PeakCoins;

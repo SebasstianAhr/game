@@ -34,7 +34,8 @@ namespace OnePercent
         public event Action<BetAction> ActionChosen;
         public event Action StatsRequested;
 
-        private const int HistoryLines = 10;
+        // En vertical caben menos líneas sin que el texto quede diminuto.
+        private const int HistoryLines = 6;
 
         private bool initialized;
         private bool debugVisible;
@@ -60,6 +61,9 @@ namespace OnePercent
                 }
             });
             debugButton.onClick.AddListener(ToggleDebug);
+
+            // El botón Debug revela la probabilidad real: solo existe en el editor y en compilaciones de desarrollo.
+            debugButton.gameObject.SetActive(Debug.isDebugBuild);
         }
 
         public void Show()
@@ -145,15 +149,15 @@ namespace OnePercent
                 string outcome;
                 if (!round.IsBet)
                 {
-                    outcome = "<color=#9AA5B1>Guardó</color>";
+                    outcome = "<color=#A9AECB>Guardó</color>";
                 }
                 else if (round.Won)
                 {
-                    outcome = "<color=#6BE675>GANÓ</color>";
+                    outcome = "<color=#F2CF7A>GANÓ</color>";
                 }
                 else
                 {
-                    outcome = "<color=#FF6B6B>PERDIÓ</color>";
+                    outcome = "<color=#E8798A>PERDIÓ</color>";
                 }
 
                 builder.Append('#').Append(round.RoundNumber).Append("  ")
