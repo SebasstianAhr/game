@@ -19,6 +19,7 @@ namespace OnePercent.EditorTools
     /// las configura solo como sprites antes de construir. Si alguna falta, se usa un color liso.
     /// Etapa 3 (vida): fundido al cambiar de pantalla, botones que se hunden, destellos y 60 fps.
     /// Etapa 4 (audio): AudioManager con música y efectos de Assets/Audio, botón de silencio y ajustes de sonido.
+    /// Etapa 5 (pantallas): menú principal, pausa (botón en la mesa) y "Cómo se juega" (sale sola la primera vez).
     /// IMPORTANTE: este script es la única fuente de verdad de la interfaz. Los cambios hechos a mano
     /// en la escena se pierden al volver a ejecutar "Construir escena".
     /// </summary>
@@ -65,6 +66,7 @@ namespace OnePercent.EditorTools
         private static Sprite sparkSprite;
         private static Sprite soundOnSprite;
         private static Sprite soundOffSprite;
+        private static Sprite pauseSprite;
 
         private static AudioClip[] sfxClips;
         private static AudioClip tableMusic;
@@ -107,6 +109,9 @@ namespace OnePercent.EditorTools
             ShieldMinigameScreen shield = BuildShieldPanel(safeArea);
             StatsScreen stats = BuildStatsPanel(safeArea);
             EndScreen end = BuildEndPanel(safeArea);
+            MenuScreen menu = BuildMenuPanel(safeArea);
+            PauseScreen pause = BuildPausePanel(safeArea);
+            HowToScreen howTo = BuildHowToPanel(safeArea);
 
             // Audio: música y efectos (Etapa 4).
             GameObject audioObject = new GameObject("AudioManager");
@@ -123,9 +128,16 @@ namespace OnePercent.EditorTools
             Assign(manager, "shieldScreen", shield);
             Assign(manager, "statsScreen", stats);
             Assign(manager, "endScreen", end);
+            Assign(manager, "menuScreen", menu);
+            Assign(manager, "pauseScreen", pause);
+            Assign(manager, "howToScreen", howTo);
 
-            // Solo la mesa empieza visible. El GameManager muestra las demás cuando hacen falta.
-            table.gameObject.SetActive(true);
+            // El GameManager muestra cada pantalla cuando hace falta.
+            // Se empieza en el menú principal.
+            menu.gameObject.SetActive(true);
+            table.gameObject.SetActive(false);
+            pause.gameObject.SetActive(false);
+            howTo.gameObject.SetActive(false);
             shield.gameObject.SetActive(false);
             stats.gameObject.SetActive(false);
             end.gameObject.SetActive(false);
@@ -248,6 +260,7 @@ namespace OnePercent.EditorTools
             sparkSprite = LoadSprite("FX/spark.png");
             soundOnSprite = LoadSprite("Icons/sound_on.png");
             soundOffSprite = LoadSprite("Icons/sound_off.png");
+            pauseSprite = LoadSprite("Icons/pause.png");
             sunCard = LoadSprite("Cards/card_sol.png");
             moonCard = LoadSprite("Cards/card_luna.png");
             eyeCard = LoadSprite("Cards/card_ojo.png");
@@ -442,7 +455,7 @@ namespace OnePercent.EditorTools
             Text unusedLabel;
             Button statsButton = NewButton("StatsButton", root, V(0.68f, 0.915f), V(0.95f, 0.965f),
                 "Estadísticas", 34, ButtonBlue, out unusedLabel);
-            NewSoundButton(root, V(0.56f, 0.915f), V(0.66f, 0.965f));
+            Button pauseButton = NewIconButton("PauseButton", root, V(0.56f, 0.915f), V(0.66f, 0.965f), pauseSprite, "II");
 
             Text goal = NewText("GoalText", root, V(0.05f, 0.868f), V(0.95f, 0.900f),
                 "Meta  10.000", 34, TextAnchor.MiddleLeft, Mist, bodyFont);
@@ -575,6 +588,7 @@ namespace OnePercent.EditorTools
             Assign(screen, "allInButton", allInButton);
             Assign(screen, "statsButton", statsButton);
             Assign(screen, "debugButton", debugButton);
+            Assign(screen, "pauseButton", pauseButton);
             Assign(screen, "saveLabel", saveLabel);
             Assign(screen, "moderateLabel", moderateLabel);
             Assign(screen, "allInLabel", allInLabel);
@@ -714,17 +728,155 @@ namespace OnePercent.EditorTools
                 string.Empty, 42, TextAnchor.UpperCenter, Ivory, bodyFont);
 
             Text newGameLabel;
-            Button newGame = NewButton("NewGameButton", root, V(0.10f, 0.20f), V(0.90f, 0.29f),
+            Button newGame = NewButton("NewGameButton", root, V(0.10f, 0.245f), V(0.90f, 0.325f),
                 "NUEVA PARTIDA", 44, ButtonJade, out newGameLabel);
             Text statsLabel;
-            Button stats = NewButton("StatsButton", root, V(0.10f, 0.08f), V(0.90f, 0.17f),
-                "ESTADÍSTICAS", 44, ButtonBlue, out statsLabel);
+            Button stats = NewButton("StatsButton", root, V(0.10f, 0.145f), V(0.90f, 0.220f),
+                "ESTADÍSTICAS", 40, ButtonBlue, out statsLabel);
+            Text menuLabel;
+            Button menuButton = NewButton("MenuButton", root, V(0.10f, 0.045f), V(0.90f, 0.120f),
+                "MENÚ PRINCIPAL", 40, ButtonBlue, out menuLabel);
 
             Assign(screen, "titleText", title);
             Assign(screen, "summaryText", summary);
             Assign(screen, "newGameButton", newGame);
             Assign(screen, "statsButton", stats);
+            Assign(screen, "menuButton", menuButton);
 
+            return screen;
+        }
+
+        // ------------------------------------------------------------------ Menú principal (Etapa 5)
+
+        private static MenuScreen BuildMenuPanel(Transform parent)
+        {
+            Image panel = NewImage("MenuPanel", parent, V(0f, 0f), V(1f, 1f), Night);
+            Transform root = panel.transform;
+            MenuScreen screen = panel.gameObject.AddComponent<MenuScreen>();
+            panel.gameObject.AddComponent<ScreenFade>();
+
+            RectTransform ringsArea = NewRect("BackgroundRingsArea", root, V(-0.20f, 0.42f), V(1.20f, 0.93f));
+            NewFitted("BackgroundRings", ringsArea, astrolabeSprite, 1f, Color.white);
+            NewDecor("MotifEye", root, V(0.03f, 0.57f), V(0.17f, 0.63f), motifEyeSprite, 0.16f);
+            NewDecor("MotifMoon", root, V(0.85f, 0.76f), V(0.97f, 0.82f), motifMoonSprite, 0.16f);
+
+            Text title = NewText("TitleText", root, V(0.05f, 0.880f), V(0.95f, 0.955f),
+                "1 % DE PROBABILIDAD", 76, TextAnchor.MiddleCenter, Gold, titleFont);
+            title.resizeTextForBestFit = true;
+            title.resizeTextMinSize = 40;
+            title.resizeTextMaxSize = 76;
+
+            // Carta decorativa que flota (el MenuScreen mueve su contenedor).
+            RectTransform heroArea = NewRect("HeroArea", root, V(0.10f, 0.50f), V(0.90f, 0.86f));
+            RectTransform glowArea = NewRect("CardGlowArea", heroArea, V(0f, 0f), V(1f, 1f));
+            NewFitted("CardGlow", glowArea, glowSprite, 0.75f, Color.white);
+            RectTransform cardArea = NewRect("CardArea", heroArea, V(0.22f, 0.10f), V(0.78f, 0.90f));
+            Image card = NewFitted("HeroCard", cardArea, eyeCard, 0.7f, Color.white);
+            if (card != null)
+            {
+                Text cardName = NewText("CardNameText", card.transform, V(0.08f, 0.05f), V(0.92f, 0.19f),
+                    "1 %", 44, TextAnchor.MiddleCenter, Ivory, titleFont);
+                cardName.resizeTextForBestFit = true;
+                cardName.resizeTextMinSize = 18;
+                cardName.resizeTextMaxSize = 44;
+            }
+
+            NewText("Subtitle", root, V(0.08f, 0.440f), V(0.92f, 0.495f),
+                "Compra tu libertad. No confíes en lo que ves.", 34, TextAnchor.MiddleCenter, Mist, bodyFont);
+
+            Text playLabel;
+            Button play = NewButton("PlayButton", root, V(0.15f, 0.335f), V(0.85f, 0.420f),
+                "JUGAR", 52, ButtonJade, out playLabel);
+            Text howToLabel;
+            Button howTo = NewButton("HowToButton", root, V(0.15f, 0.245f), V(0.85f, 0.315f),
+                "CÓMO SE JUEGA", 40, ButtonBlue, out howToLabel);
+            Text statsLabel;
+            Button stats = NewButton("StatsButton", root, V(0.15f, 0.155f), V(0.85f, 0.225f),
+                "ESTADÍSTICAS", 40, ButtonBlue, out statsLabel);
+
+            NewAudioToggle("MusicToggle", root, V(0.15f, 0.075f), V(0.485f, 0.132f), AudioSettingToggle.Setting.Music);
+            NewAudioToggle("EffectsToggle", root, V(0.515f, 0.075f), V(0.85f, 0.132f), AudioSettingToggle.Setting.Effects);
+
+            NewText("VersionText", root, V(0.05f, 0.012f), V(0.95f, 0.045f),
+                "Versión " + PlayerSettings.bundleVersion, 24, TextAnchor.MiddleCenter, Mist, bodyFont);
+
+            Assign(screen, "playButton", play);
+            Assign(screen, "howToButton", howTo);
+            Assign(screen, "statsButton", stats);
+            Assign(screen, "heroArea", heroArea);
+            return screen;
+        }
+
+        // ------------------------------------------------------------------ Pausa (Etapa 5)
+
+        private static PauseScreen BuildPausePanel(Transform parent)
+        {
+            // Fondo oscuro que cubre la mesa y bloquea los toques sobre ella.
+            Image panel = NewImage("PausePanel", parent, V(0f, 0f), V(1f, 1f), new Color(0f, 0f, 0f, 0.72f));
+            Transform root = panel.transform;
+            PauseScreen screen = panel.gameObject.AddComponent<PauseScreen>();
+            panel.gameObject.AddComponent<ScreenFade>();
+
+            Image box = NewPanel("Box", root, V(0.08f, 0.25f), V(0.92f, 0.75f));
+            Transform b = box.transform;
+
+            NewText("TitleText", b, V(0.05f, 0.83f), V(0.95f, 0.95f), "PAUSA", 64, TextAnchor.MiddleCenter, Gold, titleFont);
+
+            Text resumeLabel;
+            Button resume = NewButton("ResumeButton", b, V(0.10f, 0.64f), V(0.90f, 0.78f), "CONTINUAR", 46, ButtonJade, out resumeLabel);
+            Text howToLabel;
+            Button howTo = NewButton("HowToButton", b, V(0.10f, 0.47f), V(0.90f, 0.60f), "CÓMO SE JUEGA", 40, ButtonBlue, out howToLabel);
+            NewAudioToggle("MusicToggle", b, V(0.10f, 0.32f), V(0.485f, 0.43f), AudioSettingToggle.Setting.Music);
+            NewAudioToggle("EffectsToggle", b, V(0.515f, 0.32f), V(0.90f, 0.43f), AudioSettingToggle.Setting.Effects);
+            Text menuLabel;
+            Button menu = NewButton("MenuButton", b, V(0.10f, 0.08f), V(0.90f, 0.22f), "MENÚ PRINCIPAL", 40, ButtonCarmine, out menuLabel);
+
+            Assign(screen, "resumeButton", resume);
+            Assign(screen, "howToButton", howTo);
+            Assign(screen, "menuButton", menu);
+            Assign(screen, "menuLabel", menuLabel);
+            return screen;
+        }
+
+        // ------------------------------------------------------------------ Cómo se juega (Etapa 5)
+
+        private static HowToScreen BuildHowToPanel(Transform parent)
+        {
+            Image panel = NewImage("HowToPanel", parent, V(0f, 0f), V(1f, 1f), new Color(0f, 0f, 0f, 0.8f));
+            Transform root = panel.transform;
+            HowToScreen screen = panel.gameObject.AddComponent<HowToScreen>();
+            panel.gameObject.AddComponent<ScreenFade>();
+
+            Image box = NewPanel("Box", root, V(0.06f, 0.16f), V(0.94f, 0.84f));
+            Transform b = box.transform;
+
+            Image pageImage = NewImage("PageImage", b, V(0.30f, 0.66f), V(0.70f, 0.93f), Color.white);
+            pageImage.preserveAspect = true;
+            pageImage.raycastTarget = false;
+
+            Text title = NewText("TitleText", b, V(0.05f, 0.555f), V(0.95f, 0.640f), "TU OBJETIVO", 56, TextAnchor.MiddleCenter, Gold, titleFont);
+            title.resizeTextForBestFit = true;
+            title.resizeTextMinSize = 30;
+            title.resizeTextMaxSize = 56;
+            Text body = NewText("BodyText", b, V(0.08f, 0.22f), V(0.92f, 0.545f), string.Empty, 38, TextAnchor.MiddleCenter, Ivory, bodyFont);
+            body.resizeTextForBestFit = true;
+            body.resizeTextMinSize = 24;
+            body.resizeTextMaxSize = 38;
+            Text pageText = NewText("PageText", b, V(0.30f, 0.15f), V(0.70f, 0.21f), "1 / 3", 30, TextAnchor.MiddleCenter, Mist, bodyFont);
+
+            Text backLabel;
+            Button back = NewButton("BackButton", b, V(0.06f, 0.03f), V(0.44f, 0.13f), "ATRÁS", 40, ButtonBlue, out backLabel);
+            Text nextLabel;
+            Button next = NewButton("NextButton", b, V(0.56f, 0.03f), V(0.94f, 0.13f), "SIGUIENTE", 40, ButtonJade, out nextLabel);
+
+            Assign(screen, "titleText", title);
+            Assign(screen, "bodyText", body);
+            Assign(screen, "pageText", pageText);
+            Assign(screen, "pageImage", pageImage);
+            AssignArray(screen, "pageSprites", new UnityEngine.Object[] { coinSprite, sunCard, eyeCard });
+            Assign(screen, "backButton", back);
+            Assign(screen, "nextButton", next);
+            Assign(screen, "nextLabel", nextLabel);
             return screen;
         }
 
@@ -808,6 +960,27 @@ namespace OnePercent.EditorTools
             return image;
         }
 
+        /// <summary>Botón cuadrado con un icono. Si falta la imagen, muestra el texto alternativo.</summary>
+        private static Button NewIconButton(string name, Transform parent, Vector2 anchorMin, Vector2 anchorMax,
+            Sprite sprite, string fallbackText)
+        {
+            Text label;
+            Button button = NewButton(name, parent, anchorMin, anchorMax, string.Empty, 36, ButtonBlue, out label);
+            if (sprite != null)
+            {
+                Image icon = NewImage("Icon", button.transform, V(0.22f, 0.22f), V(0.78f, 0.78f), Gold);
+                icon.sprite = sprite;
+                icon.preserveAspect = true;
+                icon.raycastTarget = false;
+            }
+            else
+            {
+                label.text = fallbackText;
+            }
+
+            return button;
+        }
+
         /// <summary>Botón cuadrado con icono de altavoz que silencia o activa todo el sonido.</summary>
         private static void NewSoundButton(Transform parent, Vector2 anchorMin, Vector2 anchorMax)
         {
@@ -834,7 +1007,8 @@ namespace OnePercent.EditorTools
             AudioSettingToggle.Setting setting)
         {
             Text label;
-            Button button = NewButton(name, parent, anchorMin, anchorMax, "Música: SÍ", 32, Hex(0x1B2456), out label);
+            string initialText = setting == AudioSettingToggle.Setting.Music ? "Música: SÍ" : "Efectos: SÍ";
+            Button button = NewButton(name, parent, anchorMin, anchorMax, initialText, 32, Hex(0x1B2456), out label);
             AudioSettingToggle toggle = button.gameObject.AddComponent<AudioSettingToggle>();
             SerializedObject serialized = new SerializedObject(toggle);
             serialized.FindProperty("setting").enumValueIndex = (int)setting;

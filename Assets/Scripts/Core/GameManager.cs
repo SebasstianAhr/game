@@ -2,12 +2,14 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace OnePercent
 {
     /// <summary>
     /// Director del juego: crea las partidas, conecta las pantallas y decide a cuál ir.
-    /// Flujo: Mesa -> (capital bajo) Minijuego -> Mesa -> ... -> Victoria o Derrota.
+    /// Flujo: Menú -> (primera vez: Cómo se juega) -> Mesa -> (capital bajo) Escudo -> Mesa -> ... -> Victoria o Derrota.
+    /// Desde la mesa se puede abrir la Pausa. El botón "atrás" de Android se gestiona aquí (Update).
     /// </summary>
     public class GameManager : MonoBehaviour
     {
@@ -19,6 +21,9 @@ namespace OnePercent
         [SerializeField] private ShieldMinigameScreen shieldScreen;
         [SerializeField] private StatsScreen statsScreen;
         [SerializeField] private EndScreen endScreen;
+        [SerializeField] private MenuScreen menuScreen;
+        [SerializeField] private PauseScreen pauseScreen;
+        [SerializeField] private HowToScreen howToScreen;
 
         private GameSession session;
         private StatsTracker tracker;
@@ -27,6 +32,12 @@ namespace OnePercent
         // Pausa antes de pasar al Escudo o a la pantalla final, para que se vea el resultado de la ronda.
         private const float TransitionDelay = 0.8f;
         private bool transitioning;
+
+        // A dónde vuelve Estadísticas al pulsar VOLVER.
+        private bool statsOpenedFromMenu;
+
+        // Qué hacer cuando se cierre "Cómo se juega" (por ejemplo, empezar la partida la primera vez).
+        private System.Action afterHowTo;
 
         private void Start()
         {
@@ -42,15 +53,27 @@ namespace OnePercent
             shieldScreen.Initialize();
             statsScreen.Initialize();
             endScreen.Initialize();
+            menuScreen.Initialize();
+            pauseScreen.Initialize();
+            howToScreen.Initialize();
 
             tableScreen.ActionChosen += OnActionChosen;
             tableScreen.StatsRequested += OnStatsRequested;
+            tableScreen.PauseRequested += OnPauseRequested;
             statsScreen.BackRequested += OnStatsBack;
             statsScreen.ResetRequested += OnStatsReset;
             endScreen.NewGameRequested += StartNewGame;
             endScreen.StatsRequested += OnStatsRequested;
+            endScreen.MenuRequested += ShowMenu;
+            menuScreen.PlayRequested += OnMenuPlay;
+            menuScreen.HowToRequested += OnHowToRequested;
+            menuScreen.StatsRequested += OnMenuStats;
+            pauseScreen.ResumeRequested += OnResume;
+            pauseScreen.HowToRequested += OnHowToRequested;
+            pauseScreen.MenuRequested += OnPauseMenu;
+            howToScreen.Closed += OnHowToClosed;
 
-            StartNewGame();
+            ShowMenu();
         }
 
         private bool ValidateReferences()
@@ -68,6 +91,9 @@ namespace OnePercent
             ok &= Require(shieldScreen, "ShieldMinigameScreen");
             ok &= Require(statsScreen, "StatsScreen");
             ok &= Require(endScreen, "EndScreen");
+            ok &= Require(menuScreen, "MenuScreen");
+            ok &= Require(pauseScreen, "PauseScreen");
+            ok &= Require(howToScreen, "HowToScreen");
 
             if (!ok)
             {
@@ -89,12 +115,125 @@ namespace OnePercent
             return true;
         }
 
+        // ------------------------------------------------------------------ Botón "atrás" de Android
+
+        private void Update()
+        {
+            Keyboard keyboard = Keyboard.current;
+            if (keyboard == null || !keyboard.escapeKey.wasPressedThisFrame)
+            {
+                return;
+            }
+
+            // Se atiende solo la pantalla que está delante de todo.
+            if (howToScreen.IsOpen)
+            {
+                howToScreen.Close();
+            }
+            else if (pauseScreen.IsOpen)
+            {
+                OnResume();
+            }
+            else if (statsScreen.gameObject.activeSelf)
+            {
+                OnStatsBack();
+            }
+            else if (tableScreen.gameObject.activeSelf)
+            {
+                OnPauseRequested();
+            }
+            else if (menuScreen.IsOpen)
+            {
+                Application.Quit();
+            }
+
+            // En El Escudo y en la pantalla final, "atrás" no hace nada para no perder la partida por error.
+        }
+
+        // ------------------------------------------------------------------ Menú, ayuda y pausa
+
+        private void ShowMenu()
+        {
+            StopAllCoroutines();
+            transitioning = false;
+            session = null;
+
+            tableScreen.Hide();
+            shieldScreen.Hide();
+            statsScreen.Hide();
+            endScreen.Hide();
+            pauseScreen.Close();
+            menuScreen.Show();
+            AudioManager.PlayMusic(Music.Table);
+        }
+
+        private void OnMenuPlay()
+        {
+            if (!HowToScreen.HasBeenSeen)
+            {
+                // La primera vez se explica el juego y, al cerrar, empieza la partida.
+                afterHowTo = StartNewGame;
+                howToScreen.Open(config);
+                return;
+            }
+
+            StartNewGame();
+        }
+
+        private void OnHowToRequested()
+        {
+            afterHowTo = null;
+            howToScreen.Open(config);
+        }
+
+        private void OnHowToClosed()
+        {
+            System.Action next = afterHowTo;
+            afterHowTo = null;
+            if (next != null)
+            {
+                next();
+            }
+        }
+
+        private void OnMenuStats()
+        {
+            statsOpenedFromMenu = true;
+            menuScreen.Hide();
+            statsScreen.Show(tracker.Data, config);
+        }
+
+        private void OnPauseRequested()
+        {
+            if (transitioning || session == null || tableScreen.IsBusy)
+            {
+                return;
+            }
+
+            pauseScreen.Open();
+        }
+
+        private void OnResume()
+        {
+            pauseScreen.Close();
+        }
+
+        private void OnPauseMenu()
+        {
+            // Se abandona la partida en curso (no cuenta como derrota).
+            ShowMenu();
+        }
+
+        // ------------------------------------------------------------------ Partida
+
         private void StartNewGame()
         {
             int? seed = config.useFixedSeed ? (int?)config.fixedSeed : null;
             session = new GameSession(config, seed);
             lastMessage = "Elige una acción. Observa con atención: lo que ves no siempre es lo que parece.";
 
+            menuScreen.Hide();
+            pauseScreen.Close();
             endScreen.Hide();
             statsScreen.Hide();
             shieldScreen.Hide();
@@ -189,6 +328,7 @@ namespace OnePercent
         {
             tableScreen.Hide();
             shieldScreen.Hide();
+            pauseScreen.Close();
 
             bool victory = session.Outcome == GameOutcome.Victory;
             tracker.RegisterGameEnd(victory, session.PeakCoins);
@@ -199,6 +339,8 @@ namespace OnePercent
             AudioManager.Play(victory ? Sfx.Victory : Sfx.Bankrupt);
         }
 
+        // ------------------------------------------------------------------ Estadísticas
+
         private void OnStatsRequested()
         {
             if (transitioning)
@@ -206,6 +348,7 @@ namespace OnePercent
                 return;
             }
 
+            statsOpenedFromMenu = false;
             tableScreen.Hide();
             endScreen.Hide();
             statsScreen.Show(tracker.Data, config);
@@ -215,7 +358,11 @@ namespace OnePercent
         {
             statsScreen.Hide();
 
-            if (session.Outcome == GameOutcome.InProgress)
+            if (statsOpenedFromMenu || session == null)
+            {
+                menuScreen.Show();
+            }
+            else if (session.Outcome == GameOutcome.InProgress)
             {
                 tableScreen.Show();
                 tableScreen.Refresh(session, config, lastMessage);
@@ -232,6 +379,8 @@ namespace OnePercent
             tracker.ResetAll();
             statsScreen.Show(tracker.Data, config);
         }
+
+        // ------------------------------------------------------------------ Mensajes
 
         private string BuildRoundMessage(RoundResult result, List<AchievementInfo> unlocked)
         {

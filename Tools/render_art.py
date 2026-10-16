@@ -77,6 +77,7 @@ ASSETS = {
     "Shield/projectile.png": diamond(),
     "Icons/sound_on.png": '<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 100 100"><g fill="none" stroke="#FFFFFF" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"><path d="M16 40H32L52 24V76L32 60H16Z"/><path d="M64 38Q72 50 64 62M72 28Q88 50 72 72"/></g></svg>',
     "Icons/sound_off.png": '<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 100 100"><g fill="none" stroke="#FFFFFF" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"><path d="M16 40H32L52 24V76L32 60H16Z"/><path d="M66 40L86 60M86 40L66 60"/></g></svg>',
+    "Icons/pause.png": '<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 100 100"><g fill="#FFFFFF"><rect x="26" y="20" width="16" height="60" rx="5"/><rect x="58" y="20" width="16" height="60" rx="5"/></g></svg>',
     "FX/spark.png": '<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 100 100"><g fill="#FFFFFF">' + STAR4 + '</g></svg>',
 }
 

@@ -1,7 +1,6 @@
 using System;
 using System.Text;
 using UnityEngine;
-using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 namespace OnePercent
@@ -61,15 +60,7 @@ namespace OnePercent
             gameObject.SetActive(false);
         }
 
-        private void Update()
-        {
-            // El botón "atrás" de Android llega como la tecla Escape. Aquí equivale a pulsar VOLVER.
-            Keyboard keyboard = Keyboard.current;
-            if (keyboard != null && keyboard.escapeKey.wasPressedThisFrame && BackRequested != null)
-            {
-                BackRequested();
-            }
-        }
+        // El botón "atrás" de Android se gestiona en GameManager (para atender solo la pantalla de delante).
 
         private void OnResetClicked()
         {

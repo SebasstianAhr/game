@@ -50,6 +50,7 @@ namespace OnePercent
         [SerializeField] private Button allInButton;
         [SerializeField] private Button statsButton;
         [SerializeField] private Button debugButton;
+        [SerializeField] private Button pauseButton;
 
         [Header("Etiquetas de los botones de decisión")]
         [SerializeField] private Text saveLabel;
@@ -58,6 +59,13 @@ namespace OnePercent
 
         public event Action<BetAction> ActionChosen;
         public event Action StatsRequested;
+        public event Action PauseRequested;
+
+        /// <summary>True mientras se anima una decisión o un resultado (no se debe abrir la pausa).</summary>
+        public bool IsBusy
+        {
+            get { return busy; }
+        }
 
         // Colores de la paleta "tarot nocturno".
         private static readonly Color Ivory = new Color(0.929f, 0.902f, 0.827f);   // #EDE6D3
@@ -106,6 +114,16 @@ namespace OnePercent
                 }
             });
             debugButton.onClick.AddListener(ToggleDebug);
+            if (pauseButton != null)
+            {
+                pauseButton.onClick.AddListener(() =>
+                {
+                    if (!busy && PauseRequested != null)
+                    {
+                        PauseRequested();
+                    }
+                });
+            }
 
             // El botón Debug revela la probabilidad real: solo existe en el editor y en compilaciones de desarrollo.
             debugButton.gameObject.SetActive(Debug.isDebugBuild);

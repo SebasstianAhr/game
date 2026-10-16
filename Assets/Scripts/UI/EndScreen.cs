@@ -11,9 +11,11 @@ namespace OnePercent
         [SerializeField] private Text summaryText;
         [SerializeField] private Button newGameButton;
         [SerializeField] private Button statsButton;
+        [SerializeField] private Button menuButton;
 
         public event Action NewGameRequested;
         public event Action StatsRequested;
+        public event Action MenuRequested;
 
         private bool initialized;
 
@@ -33,6 +35,17 @@ namespace OnePercent
                     NewGameRequested();
                 }
             });
+
+            if (menuButton != null)
+            {
+                menuButton.onClick.AddListener(() =>
+                {
+                    if (MenuRequested != null)
+                    {
+                        MenuRequested();
+                    }
+                });
+            }
 
             statsButton.onClick.AddListener(() =>
             {
