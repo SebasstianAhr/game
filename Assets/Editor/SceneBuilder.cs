@@ -20,6 +20,7 @@ namespace OnePercent.EditorTools
     /// Etapa 3 (vida): fundido al cambiar de pantalla, botones que se hunden, destellos y 60 fps.
     /// Etapa 4 (audio): AudioManager con música y efectos de Assets/Audio, botón de silencio y ajustes de sonido.
     /// Etapa 5 (pantallas): menú principal, pausa (botón en la mesa) y "Cómo se juega" (sale sola la primera vez).
+    /// Preguntas de matemáticas: notificación con tiempo junto a la carta y pantalla de pregunta con 4 opciones.
     /// IMPORTANTE: este script es la única fuente de verdad de la interfaz. Los cambios hechos a mano
     /// en la escena se pierden al volver a ejecutar "Construir escena".
     /// </summary>
@@ -67,6 +68,8 @@ namespace OnePercent.EditorTools
         private static Sprite soundOnSprite;
         private static Sprite soundOffSprite;
         private static Sprite pauseSprite;
+        private static Sprite ringSprite;
+        private static Sprite questionCardSprite;
 
         private static AudioClip[] sfxClips;
         private static AudioClip tableMusic;
@@ -112,6 +115,8 @@ namespace OnePercent.EditorTools
             MenuScreen menu = BuildMenuPanel(safeArea);
             PauseScreen pause = BuildPausePanel(safeArea);
             HowToScreen howTo = BuildHowToPanel(safeArea);
+            QuestionNotification questionNotification = BuildQuestionNotification(table.transform);
+            QuestionScreen questionScreen = BuildQuestionPanel(safeArea);
 
             // Audio: música y efectos (Etapa 4).
             GameObject audioObject = new GameObject("AudioManager");
@@ -131,6 +136,8 @@ namespace OnePercent.EditorTools
             Assign(manager, "menuScreen", menu);
             Assign(manager, "pauseScreen", pause);
             Assign(manager, "howToScreen", howTo);
+            Assign(manager, "questionNotification", questionNotification);
+            Assign(manager, "questionScreen", questionScreen);
 
             // El GameManager muestra cada pantalla cuando hace falta.
             // Se empieza en el menú principal.
@@ -138,6 +145,8 @@ namespace OnePercent.EditorTools
             table.gameObject.SetActive(false);
             pause.gameObject.SetActive(false);
             howTo.gameObject.SetActive(false);
+            questionNotification.gameObject.SetActive(false);
+            questionScreen.gameObject.SetActive(false);
             shield.gameObject.SetActive(false);
             stats.gameObject.SetActive(false);
             end.gameObject.SetActive(false);
@@ -261,6 +270,8 @@ namespace OnePercent.EditorTools
             soundOnSprite = LoadSprite("Icons/sound_on.png");
             soundOffSprite = LoadSprite("Icons/sound_off.png");
             pauseSprite = LoadSprite("Icons/pause.png");
+            ringSprite = LoadSprite("Icons/ring.png");
+            questionCardSprite = LoadSprite("Cards/question_card.png");
             sunCard = LoadSprite("Cards/card_sol.png");
             moonCard = LoadSprite("Cards/card_luna.png");
             eyeCard = LoadSprite("Cards/card_ojo.png");
@@ -335,6 +346,19 @@ namespace OnePercent.EditorTools
             PlayerSettings.allowedAutorotateToPortraitUpsideDown = false;
             PlayerSettings.allowedAutorotateToLandscapeLeft = false;
             PlayerSettings.allowedAutorotateToLandscapeRight = false;
+
+            // En PC (ejecutable de Windows) el juego se abre en una ventana vertical, no en pantalla completa horizontal.
+            PlayerSettings.fullScreenMode = FullScreenMode.Windowed;
+            PlayerSettings.defaultIsNativeResolution = false;
+            PlayerSettings.defaultScreenWidth = 540;
+            PlayerSettings.defaultScreenHeight = 960;
+            PlayerSettings.resizableWindow = true;
+
+            // Nombre visible de la aplicación (título de la ventana y nombre del ejecutable).
+            if (PlayerSettings.productName == "My project")
+            {
+                PlayerSettings.productName = "1% de Probabilidad";
+            }
         }
 
         private static GameConfig LoadOrCreateConfig()
@@ -877,6 +901,119 @@ namespace OnePercent.EditorTools
             Assign(screen, "backButton", back);
             Assign(screen, "nextButton", next);
             Assign(screen, "nextLabel", nextLabel);
+            return screen;
+        }
+
+        // ------------------------------------------------------------------ Preguntas de matemáticas
+
+        /// <summary>
+        /// Notificación a la derecha de la carta: carta con "?", anillo dorado que se vacía y cuánto se juega.
+        /// Se crea como último hijo de la mesa para quedar encima de todo lo demás.
+        /// </summary>
+        private static QuestionNotification BuildQuestionNotification(Transform table)
+        {
+            Image root = NewImage("QuestionNotification", table, V(0.73f, 0.555f), V(0.97f, 0.700f), new Color(0f, 0f, 0f, 0f));
+            Button button = root.gameObject.AddComponent<Button>();
+            button.transition = Selectable.Transition.None;
+            QuestionNotification note = root.gameObject.AddComponent<QuestionNotification>();
+
+            RectTransform ringArea = NewRect("RingArea", root.transform, V(0f, 0.22f), V(1f, 1f));
+            Image ring = NewFitted("Ring", ringArea, ringSprite, 1f, Gold);
+            if (ring != null)
+            {
+                ring.type = Image.Type.Filled;
+                ring.fillMethod = Image.FillMethod.Radial360;
+                ring.fillOrigin = (int)Image.Origin360.Top;
+                ring.fillClockwise = false;
+                ring.fillAmount = 1f;
+            }
+
+            RectTransform bodyArea = NewRect("Body", ringArea, V(0.22f, 0.16f), V(0.78f, 0.84f));
+            Image card = NewFitted("Card", bodyArea, questionCardSprite, 0.7f, Color.white);
+            if (card == null)
+            {
+                // Sin la imagen: un panel con un "?" grande.
+                Image fallback = NewPanel("Card", bodyArea, V(0.1f, 0f), V(0.9f, 1f));
+                fallback.raycastTarget = false;
+                NewText("Mark", fallback.transform, V(0f, 0f), V(1f, 1f), "?", 90, TextAnchor.MiddleCenter, Gold, titleFont);
+            }
+
+            Text amount = NewText("AmountText", root.transform, V(0f, 0f), V(1f, 0.22f), "±10", 46, TextAnchor.MiddleCenter, Gold, boldFont);
+            amount.resizeTextForBestFit = true;
+            amount.resizeTextMinSize = 24;
+            amount.resizeTextMaxSize = 46;
+
+            Assign(note, "button", button);
+            AssignOptional(note, "ring", ring);
+            Assign(note, "amountText", amount);
+            Assign(note, "body", bodyArea);
+            return note;
+        }
+
+        /// <summary>Pantalla de la pregunta: título, apuesta, tiempo, enunciado, 4 opciones y resultado.</summary>
+        private static QuestionScreen BuildQuestionPanel(Transform parent)
+        {
+            Image panel = NewImage("QuestionPanel", parent, V(0f, 0f), V(1f, 1f), new Color(0f, 0f, 0f, 0.78f));
+            Transform root = panel.transform;
+            QuestionScreen screen = panel.gameObject.AddComponent<QuestionScreen>();
+            panel.gameObject.AddComponent<ScreenFade>();
+
+            Image box = NewPanel("Box", root, V(0.06f, 0.20f), V(0.94f, 0.80f));
+            Transform b = box.transform;
+
+            Text title = NewText("TitleText", b, V(0.05f, 0.880f), V(0.95f, 0.960f), "PREGUNTA MISTERIOSA", 54, TextAnchor.MiddleCenter, Gold, titleFont);
+            title.resizeTextForBestFit = true;
+            title.resizeTextMinSize = 30;
+            title.resizeTextMaxSize = 54;
+            Text stake = NewText("StakeText", b, V(0.05f, 0.815f), V(0.95f, 0.870f), string.Empty, 32, TextAnchor.MiddleCenter, Mist, bodyFont);
+            stake.resizeTextForBestFit = true;
+            stake.resizeTextMinSize = 20;
+            stake.resizeTextMaxSize = 32;
+
+            Image barBack = NewImage("TimerBar", b, V(0.08f, 0.765f), V(0.78f, 0.785f), Hex(0x1B2456));
+            barBack.raycastTarget = false;
+            Image barFill = NewImage("Fill", barBack.transform, V(0f, 0f), V(1f, 1f), Gold);
+            barFill.raycastTarget = false;
+            Text timer = NewText("TimerText", b, V(0.80f, 0.745f), V(0.95f, 0.805f), "15.0 s", 32, TextAnchor.MiddleRight, Ivory, boldFont);
+
+            Text question = NewText("QuestionText", b, V(0.05f, 0.600f), V(0.95f, 0.735f), "? = ?", 96, TextAnchor.MiddleCenter, Ivory, boldFont);
+            question.resizeTextForBestFit = true;
+            question.resizeTextMinSize = 48;
+            question.resizeTextMaxSize = 96;
+
+            Vector2[] mins = { V(0.06f, 0.410f), V(0.515f, 0.410f), V(0.06f, 0.230f), V(0.515f, 0.230f) };
+            Vector2[] maxs = { V(0.485f, 0.570f), V(0.94f, 0.570f), V(0.485f, 0.390f), V(0.94f, 0.390f) };
+            UnityEngine.Object[] buttons = new UnityEngine.Object[4];
+            UnityEngine.Object[] labels = new UnityEngine.Object[4];
+            for (int i = 0; i < 4; i++)
+            {
+                Text optionLabel;
+                Button option = NewButton("Option" + (i + 1), b, mins[i], maxs[i], "0", 64, ButtonBlue, out optionLabel);
+                // Al responder, el color lo pone QuestionScreen (verde, carmín o apagado): el botón no debe teñirlo.
+                ColorBlock colors = option.colors;
+                colors.disabledColor = Color.white;
+                option.colors = colors;
+                buttons[i] = option;
+                labels[i] = optionLabel;
+            }
+
+            Text feedback = NewText("FeedbackText", b, V(0.05f, 0.135f), V(0.95f, 0.215f), string.Empty, 36, TextAnchor.MiddleCenter, Ivory, boldFont);
+            feedback.resizeTextForBestFit = true;
+            feedback.resizeTextMinSize = 22;
+            feedback.resizeTextMaxSize = 36;
+
+            Text continueLabel;
+            Button continueButton = NewButton("ContinueButton", b, V(0.22f, 0.025f), V(0.78f, 0.120f), "CONTINUAR", 44, ButtonJade, out continueLabel);
+
+            Assign(screen, "titleText", title);
+            Assign(screen, "stakeText", stake);
+            Assign(screen, "timerText", timer);
+            Assign(screen, "questionText", question);
+            Assign(screen, "feedbackText", feedback);
+            Assign(screen, "timerFill", barFill.rectTransform);
+            AssignArray(screen, "optionButtons", buttons);
+            AssignArray(screen, "optionLabels", labels);
+            Assign(screen, "continueButton", continueButton);
             return screen;
         }
 

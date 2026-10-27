@@ -63,10 +63,26 @@ def diamond():
 <path d="M50 6L94 50L50 94L6 50Z" fill="#C2384F" stroke="#FF9AA9" stroke-width="4" stroke-linejoin="round"/>
 <path d="M50 24L76 50L50 76L24 50Z" fill="none" stroke="#FF9AA9" stroke-opacity="0.5" stroke-width="2"/></svg>'''
 
+# Pregunta misteriosa: carta pequeña con "?" y anillo que marca el tiempo de la notificación.
+QMARK = '<path d="M36 34Q36 18 50 18Q64 18 64 32Q64 42 54 47Q50 49 50 56V61"/><circle cx="50" cy="75" r="3.5" fill="{c}" stroke="none"/>'
+
+def question_card():
+    return f'''<svg xmlns="http://www.w3.org/2000/svg" width="280" height="400" viewBox="0 0 280 400">
+<rect x="4" y="4" width="272" height="392" rx="26" fill="{INK}" stroke="{GOLD_LINE}" stroke-width="5"/>
+<rect x="20" y="20" width="240" height="360" rx="14" fill="none" stroke="{GOLD_LINE}" stroke-opacity="0.5" stroke-width="2.5"/>
+<g transform="translate(126 34) scale(0.28)" fill="{GOLD_LINE}">{STAR4}</g>
+<g transform="translate(126 338) scale(0.28)" fill="{GOLD_LINE}">{STAR4}</g>
+<g transform="translate(20 80) scale(2.4)">{symbol(QMARK, GOLD, 6)}</g>
+</svg>'''
+
+def ring():
+    return '<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256"><circle cx="128" cy="128" r="118" fill="none" stroke="#FFFFFF" stroke-width="12"/></svg>'
+
 ASSETS = {
     "Cards/card_sol.png": card(SOL), "Cards/card_luna.png": card(LUNA), "Cards/card_ojo.png": card(OJO),
     "Cards/card_glow.png": glow(),
     "Icons/coin.png": coin(),
+    "Cards/question_card.png": question_card(), "Icons/ring.png": ring(),
     "Icons/sym_sol.png": icon(SOL_S), "Icons/sym_luna.png": icon(LUNA_S), "Icons/sym_ojo.png": icon(OJO_S),
     "UI/panel_9slice.png": rounded(96, 24, fill=INK, stroke="#C9A55A", sw=3),
     "UI/button_9slice.png": rounded(96, 24),
@@ -75,10 +91,6 @@ ASSETS = {
     "Background/astrolabe.png": astrolabe(),
     "Background/motif_eye.png": motif(OJO_S), "Background/motif_moon.png": motif(LUNA_S),
     "Shield/projectile.png": diamond(),
-    "Icons/sound_on.png": '<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 100 100"><g fill="none" stroke="#FFFFFF" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"><path d="M16 40H32L52 24V76L32 60H16Z"/><path d="M64 38Q72 50 64 62M72 28Q88 50 72 72"/></g></svg>',
-    "Icons/sound_off.png": '<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 100 100"><g fill="none" stroke="#FFFFFF" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"><path d="M16 40H32L52 24V76L32 60H16Z"/><path d="M66 40L86 60M86 40L66 60"/></g></svg>',
-    "Icons/pause.png": '<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 100 100"><g fill="#FFFFFF"><rect x="26" y="20" width="16" height="60" rx="5"/><rect x="58" y="20" width="16" height="60" rx="5"/></g></svg>',
-    "FX/spark.png": '<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 100 100"><g fill="#FFFFFF">' + STAR4 + '</g></svg>',
 }
 
 with sync_playwright() as p:

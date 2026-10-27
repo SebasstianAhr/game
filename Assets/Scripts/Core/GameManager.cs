@@ -10,6 +10,7 @@ namespace OnePercent
     /// Director del juego: crea las partidas, conecta las pantallas y decide a cuál ir.
     /// Flujo: Menú -> (primera vez: Cómo se juega) -> Mesa -> (capital bajo) Escudo -> Mesa -> ... -> Victoria o Derrota.
     /// Desde la mesa se puede abrir la Pausa. El botón "atrás" de Android se gestiona aquí (Update).
+    /// Preguntas de matemáticas: una opcional (notificación con tiempo) cada 4–7 rondas y una obligatoria cada 10.
     /// </summary>
     public class GameManager : MonoBehaviour
     {
@@ -25,6 +26,10 @@ namespace OnePercent
         [SerializeField] private PauseScreen pauseScreen;
         [SerializeField] private HowToScreen howToScreen;
 
+        [Header("Preguntas de matemáticas")]
+        [SerializeField] private QuestionNotification questionNotification;
+        [SerializeField] private QuestionScreen questionScreen;
+
         private GameSession session;
         private StatsTracker tracker;
         private string lastMessage = string.Empty;
@@ -38,6 +43,11 @@ namespace OnePercent
 
         // Qué hacer cuando se cierre "Cómo se juega" (por ejemplo, empezar la partida la primera vez).
         private System.Action afterHowTo;
+
+        // Preguntas: cuándo aparecen y la pregunta opcional que espera a ser aceptada.
+        private QuestionScheduler questionScheduler;
+        private System.Random questionRng;
+        private MathQuestion pendingQuestion;
 
         private void Start()
         {
@@ -56,6 +66,8 @@ namespace OnePercent
             menuScreen.Initialize();
             pauseScreen.Initialize();
             howToScreen.Initialize();
+            questionNotification.Initialize();
+            questionScreen.Initialize();
 
             tableScreen.ActionChosen += OnActionChosen;
             tableScreen.StatsRequested += OnStatsRequested;
@@ -72,6 +84,8 @@ namespace OnePercent
             pauseScreen.HowToRequested += OnHowToRequested;
             pauseScreen.MenuRequested += OnPauseMenu;
             howToScreen.Closed += OnHowToClosed;
+            questionNotification.Accepted += OnQuestionAccepted;
+            questionNotification.Expired += OnQuestionExpired;
 
             ShowMenu();
         }
@@ -94,6 +108,8 @@ namespace OnePercent
             ok &= Require(menuScreen, "MenuScreen");
             ok &= Require(pauseScreen, "PauseScreen");
             ok &= Require(howToScreen, "HowToScreen");
+            ok &= Require(questionNotification, "QuestionNotification");
+            ok &= Require(questionScreen, "QuestionScreen");
 
             if (!ok)
             {
@@ -126,6 +142,12 @@ namespace OnePercent
             }
 
             // Se atiende solo la pantalla que está delante de todo.
+            // Con una pregunta abierta, "atrás" no hace nada: hay que responderla.
+            if (questionScreen.IsOpen)
+            {
+                return;
+            }
+
             if (howToScreen.IsOpen)
             {
                 howToScreen.Close();
@@ -163,6 +185,7 @@ namespace OnePercent
             statsScreen.Hide();
             endScreen.Hide();
             pauseScreen.Close();
+            HideQuestions();
             menuScreen.Show();
             AudioManager.PlayMusic(Music.Table);
         }
@@ -205,17 +228,19 @@ namespace OnePercent
 
         private void OnPauseRequested()
         {
-            if (transitioning || session == null || tableScreen.IsBusy)
+            if (transitioning || session == null || tableScreen.IsBusy || questionScreen.IsOpen)
             {
                 return;
             }
 
             pauseScreen.Open();
+            questionNotification.Paused = true;
         }
 
         private void OnResume()
         {
             pauseScreen.Close();
+            questionNotification.Paused = false;
         }
 
         private void OnPauseMenu()
@@ -230,6 +255,9 @@ namespace OnePercent
         {
             int? seed = config.useFixedSeed ? (int?)config.fixedSeed : null;
             session = new GameSession(config, seed);
+            questionRng = seed.HasValue ? new System.Random(seed.Value + 1) : new System.Random();
+            questionScheduler = new QuestionScheduler(config, questionRng);
+            HideQuestions();
             lastMessage = "Elige una acción. Observa con atención: lo que ves no siempre es lo que parece.";
 
             menuScreen.Hide();
@@ -245,7 +273,7 @@ namespace OnePercent
 
         private void OnActionChosen(BetAction action)
         {
-            if (transitioning || session == null || !session.CanPerform(action))
+            if (transitioning || session == null || questionScreen.IsOpen || !session.CanPerform(action))
             {
                 return;
             }
@@ -262,12 +290,107 @@ namespace OnePercent
 
             if (session.Outcome != GameOutcome.InProgress)
             {
+                HideQuestions();
                 StartCoroutine(AfterDelay(FinishGame));
             }
             else if (session.ShouldOfferMinigame)
             {
+                HideQuestions();
                 StartCoroutine(AfterDelay(StartMinigame));
             }
+            else
+            {
+                CheckQuestionTriggers();
+            }
+        }
+
+        // ------------------------------------------------------------------ Preguntas de matemáticas
+
+        /// <summary>Después de cada ronda: ¿toca una pregunta obligatoria u ofrecer una opcional?</summary>
+        private void CheckQuestionTriggers()
+        {
+            QuestionTrigger trigger = questionScheduler.OnRoundPlayed(session.Round);
+            if (trigger == QuestionTrigger.Mandatory)
+            {
+                // La obligatoria se abre sola, un instante después de ver el resultado de la ronda.
+                questionNotification.Hide();
+                pendingQuestion = null;
+                MathQuestion mandatory = MathQuestionGenerator.Generate(session.Round, true, questionRng, config);
+                StartCoroutine(AfterDelay(() => OpenQuestion(mandatory)));
+            }
+            else if (trigger == QuestionTrigger.Optional && !questionNotification.IsShowing)
+            {
+                // La opcional se crea ya (para mostrar cuánto se juega), pero el enunciado queda oculto hasta aceptarla.
+                pendingQuestion = MathQuestionGenerator.Generate(session.Round, false, questionRng, config);
+                questionNotification.Show(pendingQuestion.Reward, config.questionOfferSeconds);
+            }
+        }
+
+        private void OnQuestionAccepted()
+        {
+            if (pendingQuestion == null || session == null || session.Outcome != GameOutcome.InProgress || transitioning)
+            {
+                pendingQuestion = null;
+                return;
+            }
+
+            MathQuestion question = pendingQuestion;
+            pendingQuestion = null;
+            OpenQuestion(question);
+        }
+
+        private void OnQuestionExpired()
+        {
+            pendingQuestion = null;
+        }
+
+        private void OpenQuestion(MathQuestion question)
+        {
+            if (session == null || session.Outcome != GameOutcome.InProgress)
+            {
+                return;
+            }
+
+            AudioManager.Play(question.Mandatory ? Sfx.ShieldAlert : Sfx.CardFlip);
+            questionScreen.Open(question, config.questionAnswerSeconds, correct => OnQuestionAnswered(question, correct));
+        }
+
+        private void OnQuestionAnswered(MathQuestion question, bool correct)
+        {
+            if (session == null)
+            {
+                return;
+            }
+
+            session.ApplyQuestionResult(correct ? question.Reward : -question.Reward);
+
+            string kind = question.Mandatory ? "Pregunta obligatoria" : "Pregunta misteriosa";
+            lastMessage = correct
+                ? kind + ": ¡correcta! +" + question.Reward + " monedas."
+                : kind + ": fallada. -" + question.Reward + " monedas.";
+
+            // Las monedas suben o bajan contando en la mesa.
+            tableScreen.Refresh(session, config, lastMessage);
+
+            if (session.Outcome != GameOutcome.InProgress)
+            {
+                HideQuestions();
+                StartCoroutine(AfterDelay(FinishGame));
+            }
+            else if (session.ShouldOfferMinigame)
+            {
+                HideQuestions();
+                StartCoroutine(AfterDelay(StartMinigame));
+            }
+        }
+
+        /// <summary>Quita la notificación y cierra la pregunta (cambio de partida, menú o fin).</summary>
+        private void HideQuestions()
+        {
+            pendingQuestion = null;
+            questionNotification.Hide();
+            questionNotification.Paused = false;
+            questionScreen.ForceClose();
         }
 
         /// <summary>Espera un momento (sin aceptar más acciones) y luego ejecuta el siguiente paso.</summary>
@@ -326,6 +449,7 @@ namespace OnePercent
 
         private void FinishGame()
         {
+            HideQuestions();
             tableScreen.Hide();
             shieldScreen.Hide();
             pauseScreen.Close();
@@ -343,7 +467,7 @@ namespace OnePercent
 
         private void OnStatsRequested()
         {
-            if (transitioning)
+            if (transitioning || questionScreen.IsOpen)
             {
                 return;
             }

@@ -58,6 +58,26 @@ namespace OnePercent
         [Tooltip("Parte baja del carril (0 a 1) donde se puede bloquear un proyectil.")]
         [Range(0.1f, 0.6f)] public float blockZoneTop = 0.30f;
 
+        [Header("Preguntas de matemáticas")]
+        [Tooltip("La pregunta opcional aparece cada cierto número de rondas, al azar entre este mínimo y el máximo.")]
+        public int optionalQuestionMinRounds = 4;
+        public int optionalQuestionMaxRounds = 7;
+        [Tooltip("Segundos que la notificación de la pregunta opcional queda visible para aceptarla.")]
+        public float questionOfferSeconds = 8f;
+        [Tooltip("Cada cuántas rondas aparece una pregunta obligatoria (0 = nunca).")]
+        public int mandatoryQuestionEvery = 10;
+        [Tooltip("Segundos para responder una vez abierta la pregunta.")]
+        public float questionAnswerSeconds = 15f;
+        public int easyQuestionReward = 10;
+        public int mediumQuestionReward = 25;
+        public int hardQuestionReward = 50;
+        [Tooltip("Las preguntas obligatorias multiplican el premio (y la pérdida) por este valor.")]
+        public int mandatoryRewardMultiplier = 2;
+        [Tooltip("Desde esta ronda las preguntas son de dificultad media (multiplicar y dividir).")]
+        public int mediumQuestionsFromRound = 10;
+        [Tooltip("Desde esta ronda las preguntas son difíciles (porcentajes y operaciones de dos pasos).")]
+        public int hardQuestionsFromRound = 25;
+
         [Header("Estadísticas")]
         [Tooltip("Apuestas registradas necesarias para marcar un patrón como descubierto.")]
         public int patternMinSamples = 8;
@@ -151,6 +171,17 @@ namespace OnePercent
             coinsPerBlock = Mathf.Max(0, coinsPerBlock);
             maxMinigameReward = Mathf.Max(0, maxMinigameReward);
             patternMinSamples = Mathf.Max(1, patternMinSamples);
+            optionalQuestionMinRounds = Mathf.Max(1, optionalQuestionMinRounds);
+            optionalQuestionMaxRounds = Mathf.Max(optionalQuestionMinRounds, optionalQuestionMaxRounds);
+            questionOfferSeconds = Mathf.Max(2f, questionOfferSeconds);
+            mandatoryQuestionEvery = Mathf.Max(0, mandatoryQuestionEvery);
+            questionAnswerSeconds = Mathf.Max(3f, questionAnswerSeconds);
+            easyQuestionReward = Mathf.Max(0, easyQuestionReward);
+            mediumQuestionReward = Mathf.Max(0, mediumQuestionReward);
+            hardQuestionReward = Mathf.Max(0, hardQuestionReward);
+            mandatoryRewardMultiplier = Mathf.Max(1, mandatoryRewardMultiplier);
+            mediumQuestionsFromRound = Mathf.Max(1, mediumQuestionsFromRound);
+            hardQuestionsFromRound = Mathf.Max(mediumQuestionsFromRound, hardQuestionsFromRound);
             sunWeight = Mathf.Max(0f, sunWeight);
             moonWeight = Mathf.Max(0f, moonWeight);
             eyeWeight = Mathf.Max(0f, eyeWeight);

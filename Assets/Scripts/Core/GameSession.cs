@@ -176,6 +176,26 @@ namespace OnePercent
             EvaluateOutcome();
         }
 
+        /// <summary>
+        /// Suma (si acertó) o resta (si falló) las monedas de una pregunta de matemáticas.
+        /// El capital nunca baja de 0. Después se revisa si la partida terminó.
+        /// </summary>
+        public void ApplyQuestionResult(int delta)
+        {
+            if (Outcome != GameOutcome.InProgress)
+            {
+                return;
+            }
+
+            Coins = Math.Max(0, Coins + delta);
+            if (Coins > PeakCoins)
+            {
+                PeakCoins = Coins;
+            }
+
+            EvaluateOutcome();
+        }
+
         private void EvaluateOutcome()
         {
             if (Coins >= config.goalCoins)
